@@ -1,0 +1,21 @@
+id,titulo,descripcion,precio,precio_oferta,categoria,url_imagen,stock,unidad,etiquetas,destacado,activo,orden
+MIL01,Milanesa napolitana con guarnición,"Carne de ternera, salsa de tomate, muzzarella y jamón. Incluye papas fritas o puré.",9800,8500,Rotisería,https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=70,12,porción,Popular,si,si,1
+POL02,Pollo al spiedo,"Pollo entero cocido a leña con papas rústicas.",11500,,Rotisería,https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=70,6,unidad,,no,si,2
+EMP03,Empanadas de carne cortada a cuchillo,"Media docena de empanadas de carne con masa casera.",7200,6500,Rotisería,https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=70,20,media docena,Oferta,si,si,3
+SOR04,Sorrentinos de ricota y jamón,"Pasta rellena artesanal. Se entregan frescos.",6400,,Rotisería,https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=600&q=70,14,500 g,Casero,no,si,4
+TAR05,Tarta de jamón y queso,"Tarta grande recién horneada.",5900,,Rotisería,https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=70,8,unidad,,no,si,5
+PAN06,Pan casero de campo,"Horma de pan de masa madre.",2200,,Panadería,https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=70,25,horma,Recién hecho,si,si,6
+FAC07,Facturas surtidas,"Docena de facturas con membrillo, crema y dulce de leche.",4800,4200,Panadería,https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=600&q=70,18,docena,Oferta,no,si,7
+MED08,Medialunas de manteca,"Docena de medialunas de manteca.",5200,,Panadería,https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=70,15,docena,,no,si,8
+HUE09,Huevos de campo,"Docena de huevos frescos de gallinas libres.",4300,,Almacén,https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&q=70,30,docena,,no,si,9
+QUE10,Queso cremoso en horma,"Cortado en el momento. Ideal para picadas.",8900,,Almacén,https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=70,10,1 kg,,no,si,10
+YER11,Yerba mate despalada,"Yerba tradicional de molienda media.",5400,4900,Almacén,https://images.unsplash.com/photo-1584225064785-c62a8b43d148?w=600&q=70,22,1 kg,Oferta,no,si,11
+ACE12,Aceite de girasol,"Girasol alto oleico.",3800,,Almacén,https://images.unsplash.com/photo-1563636619-e9143da7973b?w=600&q=70,35,"1,5 l",,no,si,12
+COC13,"Coca-Cola 1,5 L","Bebida gaseosa bien fría.",3500,2900,Bebidas,https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=600&q=70,40,"1,5 l",Oferta,si,si,13
+CER14,Cerveza artesanal IPA,"Lata de 473 ml de cervecería local.",4200,,Bebidas,https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=70,24,473 ml,Artesanal,no,si,14
+VIN15,Vino Malbec reserva,"750 ml. Apto para carnes rojas.",7600,,Bebidas,https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=70,12,750 ml,,no,si,15
+AGU16,Agua mineral sin gas,"Pack de 6 botellas de 2 L.",6500,5900,Bebidas,https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&q=70,20,pack x6,Oferta,no,si,16
+TOM17,Tomate perita,"Verdulería de estación.",2400,,Verdulería,https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&q=70,18,1 kg,,no,si,17
+PAP18,Papa negra,"Lavada y clasificada.",1900,,Verdulería,https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&q=70,40,1 kg,,no,si,18
+LEC19,Lechuga mantecosa,"De producción local.",1200,,Verdulería,https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=70,0,unidad,Agotado,no,si,19
+LIM20,Limón,"Semilla y jugoso.",2800,,Verdulería,https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=70,25,1 kg,,no,si,20

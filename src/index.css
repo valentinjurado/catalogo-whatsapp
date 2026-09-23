@@ -1,0 +1,159 @@
+@import 'tailwindcss';
+
+/*
+  Tema en tiempo de ejecución (white-label).
+  Las variables --brand-* las escribe src/config/paletas.js al iniciar la app,
+  así el mismo build sirve para distintos negocios sólo cambiando negocio.js.
+*/
+:root {
+  --brand-50: #ecfdf5;
+  --brand-100: #d1fae5;
+  --brand-200: #a7f3d0;
+  --brand-300: #6ee7b7;
+  --brand-400: #34d399;
+  --brand-500: #10b981;
+  --brand-600: #059669;
+  --brand-700: #047857;
+  --brand-800: #065f46;
+  --brand-900: #064e3b;
+  --brand-950: #022c22;
+  --radio: 1rem;
+}
+
+/* @theme inline: los utilitarios apuntan a las variables, no a valores fijos */
+@theme inline {
+  --color-brand-50: var(--brand-50);
+  --color-brand-100: var(--brand-100);
+  --color-brand-200: var(--brand-200);
+  --color-brand-300: var(--brand-300);
+  --color-brand-400: var(--brand-400);
+  --color-brand-500: var(--brand-500);
+  --color-brand-600: var(--brand-600);
+  --color-brand-700: var(--brand-700);
+  --color-brand-800: var(--brand-800);
+  --color-brand-900: var(--brand-900);
+  --color-brand-950: var(--brand-950);
+  --radius-card: var(--radio);
+  --font-sans:
+    'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    background-color: #f7f8fa;
+    color: #0f172a;
+    font-family: var(--font-sans);
+    font-feature-settings: 'tnum' 1;
+  }
+  /* Accesibilidad: foco visible siempre */
+  :focus-visible {
+    outline: 2px solid var(--brand-600);
+    outline-offset: 2px;
+    border-radius: 6px;
+  }
+  /* Scroll suave en listas internas */
+  .scroll-fino {
+    scrollbar-width: thin;
+    scrollbar-color: #cbd5e1 transparent;
+  }
+  .scroll-fino::-webkit-scrollbar {
+    width: 8px;
+  }
+  .scroll-fino::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 99px;
+  }
+}
+
+@layer utilities {
+  /* Animaciones sutiles (sin efectos pesados) */
+  @keyframes aparecer {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes entrarPanel {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: none;
+    }
+  }
+  @keyframes fundido {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+  @keyframes subirModal {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.99);
+    }
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+  @keyframes latido {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.08);
+    }
+  }
+  .anim-aparecer {
+    animation: aparecer 0.35s ease-out both;
+  }
+  .anim-panel {
+    animation: entrarPanel 0.28s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-fundido {
+    animation: fundido 0.2s ease-out both;
+  }
+  .anim-modal {
+    animation: subirModal 0.25s cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  .anim-latido {
+    animation: latido 0.4s ease-out;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+  .tarjeta {
+    background: #fff;
+    border: 1px solid #e9edf2;
+    border-radius: var(--radio);
+    box-shadow: 0 1px 2px rgb(15 23 42 / 0.04);
+  }
+  .tarjeta-hover {
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease,
+      border-color 0.18s ease;
+  }
+  .tarjeta-hover:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 14px 30px -18px rgb(15 23 42 / 0.35);
+    border-color: var(--brand-200);
+  }
+}

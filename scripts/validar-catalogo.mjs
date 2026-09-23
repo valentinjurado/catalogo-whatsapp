@@ -1,0 +1,70 @@
+#!/usr/bin/env node
+/**
+ * Validador del CSV del catálogo (uso interno antes de publicar la planilla).
+ *
+ *   node scripts/validar-catalogo.mjs docs/mi-catalogo.csv
+ *   node scripts/validar-catalogo.mjs https://docs.google.com/.../pub?output=csv
+ *
+ * Usa EXACTAMENTE el mismo parser que la web (src/services/catalogo.js), así
+ * que si acá pasa, en el navegador también. Sale con código 1 si hay errores.
+ */
+import { readFile } from 'node:fs/promises'
+import { transformarCatalogo } from '../src/services/catalogo.js'
+
+const origen = process.argv[2]
+if (!origen) {
+  console.error('Uso: node scripts/validar-catalogo.mjs <archivo.csv | url>')
+  process.exit(2)
+}
+
+const esUrl = /^https?:\/\//i.test(origen)
+const texto = esUrl
+  ? await (async () => {
+      const r = await fetch(origen)
+      if (!r.ok) throw new Error(`La URL respondió ${r.status}`)
+      return r.text()
+    })()
+  : await readFile(origen, 'utf8')
+
+if (/^\s*<(!doctype|html)/i.test(texto)) {
+  console.error('✗ La respuesta es HTML, no CSV: la hoja no está publicada como CSV.')
+  process.exit(1)
+}
+
+const { productos, categorias, avisos, totalFilas } = transformarCatalogo(texto)
+
+console.log(`Filas leídas:      ${totalFilas}`)
+console.log(`Productos activos: ${productos.length}`)
+console.log(`Categorías:        ${categorias.join(' | ') || '(ninguna)'}`)
+
+const sinPrecio = productos.filter((p) => !p.precio && !p.precioOferta)
+const sinImagen = productos.filter((p) => !p.urlImagen)
+const sinStock = productos.filter((p) => p.sinStock)
+const duplicados = Object.entries(
+  productos.reduce((acc, p) => ({ ...acc, [p.id]: (acc[p.id] || 0) + 1 }), {}),
+).filter(([, n]) => n > 1)
+
+console.log(`\nSin precio:  ${sinPrecio.length}`)
+console.log(`Sin imagen:  ${sinImagen.length}`)
+console.log(`Sin stock:   ${sinStock.length}`)
+console.log(`IDs repetidos: ${duplicados.length}`)
+
+if (avisos.length) {
+  console.log('\nAvisos del parser:')
+  avisos.forEach((a) => console.log(`  - ${a}`))
+}
+if (sinPrecio.length) {
+  console.log('\nProductos sin precio válido:')
+  sinPrecio.forEach((p) => console.log(`  - ${p.titulo}`))
+}
+if (duplicados.length) {
+  console.log('\nOjo: dos filas comparten el mismo id (el carrito las mezclaría):')
+  duplicados.forEach(([id, n]) => console.log(`  - ${id} (x${n})`))
+}
+
+const errores = sinPrecio.length + duplicados.length
+if (errores) {
+  console.log(`\n✗ ${errores} problema(s) a corregir antes de publicar.`)
+  process.exit(1)
+}
+console.log('\n✓ Catálogo válido.')

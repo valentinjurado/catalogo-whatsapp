@@ -1,0 +1,4 @@
+id,titulo,descripcion,precio,precio_oferta,categoria,url_imagen,stock,unidad,etiquetas,destacado,activo,orden
+PROD-001,Milanesa napolitana,Carne con salsa y muzzarella. Incluye guarnición.,8500,7500,Rotisería,https://ejemplo.com/milanesa.jpg,10,porción,Popular,si,si,1
+PROD-002,Coca-Cola 1,5 L,Gaseosa línea Coca-Cola.,3200,,Bebidas,https://ejemplo.com/coca.jpg,24,1,5 l,,no,si,2
+PROD-003,Pan casero,Horma de pan de campo.,2200,,Panadería,https://ejemplo.com/pan.jpg,15,horma,Recién hecho,no,si,3

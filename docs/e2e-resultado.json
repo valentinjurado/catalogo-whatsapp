@@ -1,0 +1,168 @@
+{
+ "url": "http://localhost:4173/",
+ "fecha": "2026-09-23T02:10:19.233Z",
+ "checks": {
+  "carrito arranca vacío": {
+   "ok": true,
+   "detalle": ""
+  },
+  "catálogo renderiza productos": {
+   "ok": true,
+   "detalle": "20 tarjetas"
+  },
+  "modo demostración avisado": {
+   "ok": true,
+   "detalle": ""
+  },
+  "producto agotado bloqueado": {
+   "ok": true,
+   "detalle": "botón deshabilitado"
+  },
+  "ofertas con precio tachado": {
+   "ok": true,
+   "detalle": ""
+  },
+  "imágenes de producto cargadas": {
+   "ok": true,
+   "detalle": "20/20"
+  },
+  "el buscador filtra": {
+   "ok": true,
+   "detalle": "1 resultados"
+  },
+  "el filtro por categoría funciona": {
+   "ok": true,
+   "detalle": "3 en Panadería"
+  },
+  "agrega productos al carrito": {
+   "ok": true,
+   "detalle": "3 líneas"
+  },
+  "abre el carrito lateral (off-canvas)": {
+   "ok": true,
+   "detalle": ""
+  },
+  "ofrece envío y retiro": {
+   "ok": true,
+   "detalle": ""
+  },
+  "calcula totales": {
+   "ok": true,
+   "detalle": "Subtotal | $ 17.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 2.000,00 | Total | $ 17.200,00"
+  },
+  "abre el checkout en el paso de datos": {
+   "ok": true,
+   "detalle": ""
+  },
+  "bloquea el avance sin datos": {
+   "ok": true,
+   "detalle": "3 errores marcados"
+  },
+  "avanza al paso de pago": {
+   "ok": true,
+   "detalle": ""
+  },
+  "ofrece efectivo y transferencia": {
+   "ok": true,
+   "detalle": ""
+  },
+  "no pide datos de tarjeta": {
+   "ok": true,
+   "detalle": ""
+  },
+  "muestra el alias para transferir": {
+   "ok": true,
+   "detalle": ""
+  },
+  "muestra el CBU": {
+   "ok": true,
+   "detalle": ""
+  },
+  "permite copiar los datos bancarios": {
+   "ok": true,
+   "detalle": "3 botones Copiar"
+  },
+  "pide adjuntar el comprobante": {
+   "ok": true,
+   "detalle": ""
+  },
+  "llega al paso de confirmación": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el enlace apunta a wa.me con el número configurado": {
+   "ok": true,
+   "detalle": "https://wa.me/5492494123456"
+  },
+  "la URL no tiene espacios ni comillas sin codificar": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje lleva el número de orden": {
+   "ok": true,
+   "detalle": "PED-260922-F6U4"
+  },
+  "el mensaje lleva el detalle con subtotales": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje lleva los totales": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje lleva la modalidad de entrega": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje lleva la forma de pago": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje incluye la frase de transferencia exigida": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el mensaje lleva los datos del cliente": {
+   "ok": true,
+   "detalle": ""
+  },
+  "muestra la pantalla de éxito": {
+   "ok": true,
+   "detalle": ""
+  },
+  "guarda el número de orden en el dispositivo": {
+   "ok": true,
+   "detalle": ""
+  },
+  "en celular aparece la barra de pedido": {
+   "ok": true,
+   "detalle": ""
+  },
+  "el carrito sobrevive al recargar": {
+   "ok": true,
+   "detalle": "3 líneas"
+  }
+ },
+ "datos": {
+  "tarjetas": 20,
+  "imagenes": "20/20",
+  "busqueda": 1,
+  "porCategoria": 3,
+  "totalesCarrito": "Subtotal | $ 17.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 2.000,00 | Total | $ 17.200,00",
+  "erroresValidacion": 3,
+  "formasDePago": [
+   "efectivo",
+   "transferencia"
+  ],
+  "botonesCopiar": 3,
+  "numeroOrden": "PED-260922-F6U4",
+  "mensaje": "*NUEVO PEDIDO PED-260922-F6U4*\nAlmacén Doña Rosa — 22/09/2026 23:10\n\n*Detalle del pedido*\n• 1 x Milanesa napolitana con guarnición (porción) — $ 8.500,00\n• 1 x Empanadas de carne cortada a cuchillo (media docena) — $ 6.500,00\n• 1 x Pan casero de campo (horma) — $ 2.200,00\n\nSubtotal (3 ítems): $ 17.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 2.000,00\n*TOTAL: $ 17.200,00*\n\n*Entrega*\nModalidad: Envío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nForma de pago: Transferencia bancaria\nAlias: almacen.donarosa.mp\nYa realicé el pago al alias indicado, te adjunto el comprobante.\n\n*Cliente*\nNombre: Valentin Jurado\nTeléfono: 2494 123456\n\n_Pedido generado automáticamente desde la web del catálogo._",
+  "ordenGuardada": "PED-260922-F6U4",
+  "barraMovil": "3 | Ver mi pedido | $ 17.200,00"
+ },
+ "resumen": {
+  "total": 35,
+  "ok": 35,
+  "fallos": []
+ }
+}
