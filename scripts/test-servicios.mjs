@@ -16,7 +16,7 @@ import {
   validarCheckout,
 } from '../src/services/pedido.js'
 import { construirMensajePedido, construirUrlWhatsapp } from '../src/services/whatsapp.js'
-import { transformarCatalogo, normalizarUrlImagen } from '../src/services/catalogo.js'
+import { transformarCatalogo, normalizarUrlImagen, urlsImagen } from '../src/services/catalogo.js'
 import { NEGOCIO } from '../src/config/negocio.js'
 
 let pruebas = 0
@@ -101,6 +101,29 @@ t('convierte links de Google Drive en links directos de imagen', () => {
     'un link normal queda igual',
   )
   assert.equal(normalizarUrlImagen(''), '')
+})
+
+t('los links de Drive traen un segundo formato de respaldo', () => {
+  const drive = urlsImagen('https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQr/view?usp=sharing')
+  assert.equal(drive.principal, 'https://drive.google.com/uc?export=view&id=1AbCdEfGhIjKlMnOpQr')
+  assert.equal(drive.alternativa, 'https://lh3.googleusercontent.com/d/1AbCdEfGhIjKlMnOpQr=w1200')
+
+  const normal = urlsImagen('https://miapp.com/fotos/pizza.jpg')
+  assert.equal(normal.principal, 'https://miapp.com/fotos/pizza.jpg')
+  assert.equal(normal.alternativa, null, 'un link directo no necesita respaldo')
+})
+
+t('acepta un link de respaldo escrito a mano (separado con |)', () => {
+  const par = urlsImagen('https://misitio.com/a.jpg|https://otro.com/b.jpg')
+  assert.equal(par.principal, 'https://misitio.com/a.jpg')
+  assert.equal(par.alternativa, 'https://otro.com/b.jpg')
+
+  // cada mitad sigue convirtiendo links de Drive por separado
+  const mixto = urlsImagen(
+    'https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQr/view?usp=sharing|https://otro.com/b.jpg',
+  )
+  assert.equal(mixto.principal, 'https://drive.google.com/uc?export=view&id=1AbCdEfGhIjKlMnOpQr')
+  assert.equal(mixto.alternativa, 'https://otro.com/b.jpg')
 })
 
 t('lee ingredientes y arma los filtros rápidos con las etiquetas', () => {

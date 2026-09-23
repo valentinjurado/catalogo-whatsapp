@@ -60,14 +60,44 @@ function limpiarEncabezado(encabezado) {
  *   …/uc?id=ID  o link directo      ->  queda igual
  */
 export function normalizarUrlImagen(url) {
+  return urlsImagen(url).principal
+}
+
+/**
+ * Devuelve el link principal y uno alternativo para la misma foto.
+ *
+ * Dos formas de definir un respaldo:
+ *  1. Google Drive: se convierte el link de compartir a link directo y se agrega
+ *     el otro formato de Drive como alternativa (según el archivo y la cuenta,
+ *     uno puede fallar y el otro no).
+ *  2. A mano: en la celda se pueden escribir DOS links separados por "|":
+ *     url_imagen = "https://sitio.com/foto.jpg|https://otro.com/foto.jpg"
+ *     La web usa el primero y, si falla, prueba el segundo.
+ */
+export function urlsImagen(url) {
   const original = String(url || '').trim()
-  if (!original) return ''
+  if (!original) return { principal: '', alternativa: null }
+
+  if (original.includes('|')) {
+    const [primero, segundo] = original.split('|').map((u) => u.trim())
+    const principal = convertirDrive(primero)
+    return { principal: principal.principal, alternativa: segundo ? convertirDrive(segundo).principal : principal.alternativa }
+  }
+
+  return convertirDrive(original)
+}
+
+/** Link de compartir de Drive -> link directo + el formato alternativo. */
+function convertirDrive(original) {
   const id = original.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/)?.[1]
     || original.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)?.[1]
   if (id && /drive\.google\.com|docs\.google\.com/.test(original)) {
-    return `https://drive.google.com/uc?export=view&id=${id}`
+    return {
+      principal: `https://drive.google.com/uc?export=view&id=${id}`,
+      alternativa: `https://lh3.googleusercontent.com/d/${id}=w1200`,
+    }
   }
-  return original
+  return { principal: original, alternativa: null }
 }
 
 /** Convierte el texto CSV en filas-objeto con encabezados limpios. */
@@ -91,6 +121,7 @@ export function normalizarProducto(fila, indice = 0) {
   const hayOferta = oferta > 0 && oferta < precio
   const stockCrudo = String(buscar(fila, ALIAS.stock)).trim()
   const stock = stockCrudo === '' ? -1 : parsearPrecio(stockCrudo) // -1 = sin control de stock
+  const imagenes = urlsImagen(buscar(fila, ALIAS.urlImagen))
 
   return {
     id: String(buscar(fila, ALIAS.id) || slug(titulo) || `prod-${indice + 1}`),
@@ -102,7 +133,9 @@ export function normalizarProducto(fila, indice = 0) {
     precioOferta: hayOferta ? oferta : null,
     precioFinal: hayOferta ? oferta : precio,
     categoria: String(buscar(fila, ALIAS.categoria) || 'Sin categoría').trim(),
-    urlImagen: normalizarUrlImagen(buscar(fila, ALIAS.urlImagen)),
+    urlImagen: imagenes.principal,
+    // Segundo link para la misma foto (Drive): la tarjeta lo prueba si el primero falla
+    urlImagenAlt: imagenes.alternativa,
     stock,
     sinStock: stock === 0,
     unidad: String(buscar(fila, ALIAS.unidad) || '').trim(),

@@ -17,7 +17,7 @@ export const esperar = (ms) => new Promise((r) => setTimeout(r, ms))
  * Abre una pestaña, la deja navegada y devuelve helpers para manejarla.
  * @returns {Promise<{evaluar, navegar, esperarSelector, captura, cerrar, cerrarPestania}>}
  */
-export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = false } = {}) {
+export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = false, sinCache = false } = {}) {
   const version = await (await fetch(`${CDP_HTTP}/json/version`)).json()
   console.log('Navegador:', version.Browser)
 
@@ -73,6 +73,14 @@ export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = fa
       if (await evaluar(expresion).catch(() => false)) return true
     }
     return false
+  }
+
+  // Datos frescos: el perfil del navegador conserva el CSV en su caché de disco,
+  // así que en las pruebas que dependen del contenido se apaga la caché HTTP.
+  if (sinCache) {
+    await enviar('Network.enable').catch(() => {})
+    await enviar('Network.setCacheDisabled', { cacheDisabled: true }).catch(() => {})
+    await enviar('Network.clearBrowserCache').catch(() => {})
   }
 
   const captura = async (ruta) => {

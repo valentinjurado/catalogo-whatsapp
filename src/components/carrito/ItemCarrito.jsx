@@ -15,6 +15,7 @@ export default function ItemCarrito({ item, onCambiarCantidad, onQuitar, onNota 
     <li className="flex gap-3 py-4">
       <ImagenProducto
         src={item.urlImagen}
+        srcAlt={item.urlImagenAlt}
         alt={item.titulo}
         proporcion="aspect-square"
         className="w-20 shrink-0 rounded-xl border border-slate-100"

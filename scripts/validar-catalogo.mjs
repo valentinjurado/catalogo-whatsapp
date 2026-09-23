@@ -70,8 +70,12 @@ if (duplicados.length) {
 // Links de Google Drive: se avisa cómo quedan después de la conversión automática
 const drive = productos.filter((p) => /drive\.google\.com|docs\.google\.com/.test(p.urlImagen))
 if (drive.length) {
-  console.log('\nFotos en Google Drive (la web las convierte sola a link directo):')
-  drive.forEach((p) => console.log(`  - ${p.titulo} -> ${p.urlImagen}`))
+  console.log('\nFotos en Google Drive (la web las convierte a link directo y prueba los dos formatos):')
+  drive.forEach((p) => {
+    console.log(`  - ${p.titulo}`)
+    console.log(`      principal:  ${p.urlImagen}`)
+    console.log(`      respaldo:   ${p.urlImagenAlt || '(sin respaldo)'}`)
+  })
 }
 
 const sospechosas = productos.filter(

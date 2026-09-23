@@ -42,6 +42,7 @@ export function lineaDesdeProducto(producto, cantidad = 1) {
     precioOferta: producto.precioOferta ?? null,
     precioFinal: producto.precioFinal ?? producto.precio,
     urlImagen: producto.urlImagen,
+    urlImagenAlt: producto.urlImagenAlt ?? null,
     unidad: producto.unidad,
     categoria: producto.categoria,
     sinStock: producto.sinStock,
@@ -137,6 +138,7 @@ export function carritoReducer(estado, accion) {
             precioOferta: p.precioOferta ?? null,
             precioFinal: p.precioFinal ?? p.precio,
             urlImagen: p.urlImagen,
+            urlImagenAlt: p.urlImagenAlt ?? null,
             sinStock: p.sinStock,
           }
         })

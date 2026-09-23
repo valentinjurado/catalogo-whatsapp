@@ -14,7 +14,7 @@ export default function FichaProducto({ producto, cantidad = 0, onCerrar, onAgre
   const [cantidadElegida, setCantidadElegida] = useState(1)
   if (!producto) return null
 
-  const { titulo, descripcion, ingredientes, precio, precioOferta, precioFinal, categoria, unidad, etiquetas, sinStock, urlImagen } =
+  const { titulo, descripcion, ingredientes, precio, precioOferta, precioFinal, categoria, unidad, etiquetas, sinStock, urlImagen, urlImagenAlt } =
     producto
   const descuento = precioOferta ? Math.round(((precio - precioOferta) / precio) * 100) : 0
 
@@ -63,7 +63,7 @@ export default function FichaProducto({ producto, cantidad = 0, onCerrar, onAgre
       }
     >
       <div className="space-y-5">
-        <ImagenProducto src={urlImagen} alt={titulo} proporcion="aspect-[16/10]" prioridad className="rounded-2xl" />
+        <ImagenProducto src={urlImagen} srcAlt={urlImagenAlt} alt={titulo} proporcion="aspect-[16/10]" prioridad className="rounded-2xl" />
 
         <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
           {precioOferta && (

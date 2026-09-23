@@ -26,6 +26,7 @@ export default function ProductCard({
     precioFinal,
     categoria,
     urlImagen,
+    urlImagenAlt,
     unidad,
     sinStock,
     etiquetas = [],
@@ -48,7 +49,7 @@ export default function ProductCard({
         aria-label={`Ver detalle de ${titulo}`}
         className="relative block w-full text-left"
       >
-        <ImagenProducto src={urlImagen} alt={titulo} prioridad={prioridad} />
+        <ImagenProducto src={urlImagen} srcAlt={urlImagenAlt} alt={titulo} prioridad={prioridad} />
 
         {descuento > 0 && !sinStock && (
           <span className="absolute top-3 left-3 rounded-full bg-red-500 px-2.5 py-1 text-xs font-bold text-white shadow-sm">

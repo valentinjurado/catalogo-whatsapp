@@ -284,10 +284,17 @@ En el celular, una barra fija mantiene el pedido a un toque.
         'integrado</b>: se comparte la foto como “cualquiera con el enlace” y la web convierte '
         'sola el link de compartir en link directo (<font face="Courier" size="8">/file/d/ID/view'
         '</font> → <font face="Courier" size="8">uc?export=view&amp;id=ID</font>).',
+        '<b>Respaldo automático:</b> si ese primer link falla, la web prueba el otro formato de '
+        'Drive (<font face="Courier" size="8">lh3.googleusercontent.com/d/ID</font>) antes de dar '
+        'la imagen por rota. Verificado con una prueba en navegador: intenta el primero, intenta '
+        'el segundo y muestra la foto.',
+        '<b>Respaldo a medida:</b> en la celda se pueden escribir dos links separados por “|” '
+        '(<font face="Courier" size="8">link1|link2</font>) y la web usa el segundo si el primero '
+        'falla.',
         'Lo más estable: subir las fotos al hosting del sitio o a un servicio de imágenes '
         '(Imgur, Cloudinary): no dependen de permisos de Drive.',
-        'Si una foto falla, la tarjeta muestra la inicial del producto en lugar del ícono de '
-        'imagen rota: la grilla nunca se ve “rota”.',
+        'Si todo falla, la tarjeta muestra la inicial del producto en lugar del ícono de imagen '
+        'rota: la grilla nunca se ve “rota”.',
         '<b>Qué no publicar:</b> la hoja publicada como CSV es pública (incluye productos con '
         '<font face="Courier" size="8">activo = no</font> y la columna <font face="Courier" '
         'size="8">stock</font>). Costos, márgenes y notas internas van en otra pestaña que no se '
@@ -321,8 +328,7 @@ En el celular, una barra fija mantiene el pedido a un toque.
             ['precio', 'SÍ', '9800', 'Acepta 9800, 9.800,50, $ 9.800. La coma decimal se interpreta sola.'],
             ['precio_oferta', 'no', '8500', 'Si es menor al precio, se muestra tachado y con el % de descuento.'],
             ['categoria', 'no', 'Rotisería', 'Con esto se arman los filtros de arriba del catálogo.'],
-            ['url_imagen', 'no', 'https://…jpg', 'URL pública de la foto. En Drive: '
-                                              'drive.google.com/uc?export=view&id=ID'],
+            ['url_imagen', 'no', 'https://…jpg', 'Link público de la foto. En Drive: pegar el link de compartir y la web lo convierte. Se puede agregar un respaldo con “|”: link1|link2'],
             ['stock', 'no', '12', '0 = Agotado (no se puede agregar). Vacío = sin control de stock.'],
             ['unidad', 'no', 'kg', 'Se muestra como “/ kg” junto al precio.'],
             ['etiquetas', 'no', 'Vegano,Más pedida', 'Hasta 2 visibles en la tarjeta y todas se vuelven filtros rápidos.'],

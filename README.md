@@ -96,14 +96,20 @@ lee, nunca se modifica desde la web. Entonces:
 
 La planilla guarda **un link público** a la foto (no el archivo). La web lo usa como `<img src>`:
 
-1. **Google Drive** (ya integrado): subo la foto → *Compartir* → *Cualquier persona con el
-   enlace* → copio el enlace → lo pego en `url_imagen`. La web lo convierte sola a link directo
-   (`/file/d/ID/view` → `uc?export=view&id=ID`). Si Drive cambia los permisos, la tarjeta
-   muestra la inicial del producto en vez de una imagen rota.
-2. **Lo más estable:** subir las fotos al mismo hosting del sitio o a un servicio de imágenes
-   (Imgur, Cloudinary). No dependen de permisos de Drive.
-3. **Verificar después de cargar:** `npm run validar <url-del-csv>` avisa de imágenes vacías,
-   links que no son http(s) y links de Drive (mostrando cómo quedan convertidos).
+1. **Google Drive** (ya integrado): subo la foto a Drive → botón derecho → *Compartir* →
+   *Cualquier persona con el enlace* → Copiar enlace → pego ESO en `url_imagen`.
+   La web lo convierte sola a link directo (`/file/d/ID/view` → `uc?export=view&id=ID`) y, si
+   ese formato falla, prueba automáticamente el otro formato de Drive
+   (`lh3.googleusercontent.com/d/ID`). Si los dos fallan, muestra la inicial del producto.
+2. **Lo más estable:** subir las fotos al mismo hosting del sitio (por ejemplo
+   `https://mipizzeria.com.ar/fotos/muzzarella.jpg`) o a un servicio de imágenes
+   (Imgur, Cloudinary). Son links que no dependen de permisos de Drive.
+3. **Respaldo propio (opcional):** en la celda se pueden poner dos links separados por `|`.
+   La web usa el primero y, si falla, entra el segundo:
+   `https://drive.google.com/file/d/ID/view|https://mipizzeria.com.ar/fotos/muzzarella.jpg`.
+   (Verificado con un test: pide el primero, pide el segundo y muestra la foto.)
+4. **Probar siempre después de cargar:** `npm run validar <url-del-csv>` avisa de imágenes
+   vacías, links que no son http(s) y links de Drive (mostrando los dos formatos).
 
 > ⚠️ **Qué conviene NO publicar en la planilla:** la hoja publicada como CSV es *pública*
 > (cualquiera con el link la lee, incluidos los productos con `activo = no` y la columna
@@ -132,7 +138,7 @@ Posible sin cambiar la arquitectura, pero ya no es "cero backend":
 | `precio` | **sí** | `9800` o `9.800,50` | Acepta `$`, puntos y comas |
 | `precio_oferta` | no | `8900` | Si es menor al precio: tachado + % de descuento |
 | `categoria` | no | `Pizzas` | Arma los filtros del menú |
-| `url_imagen` | no | `https://…jpg` | En Drive: `drive.google.com/uc?export=view&id=ID` |
+| `url_imagen` | no | `https://…jpg` | Link público. En Drive: pegar el link de compartir (se convierte solo). Se puede poner un respaldo: `link1\|link2` |
 | `stock` | no | `12` | `0` = Agotado. Vacío = sin control |
 | `unidad` | no | `8 porciones` | Se muestra como `/ 8 porciones` junto al precio |
 | `etiquetas` | no | `Vegano,Más pedida` | Hasta 2 visibles en la tarjeta y **todas se vuelven filtros rápidos** |
