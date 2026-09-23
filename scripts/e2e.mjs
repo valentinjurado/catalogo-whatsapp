@@ -125,6 +125,31 @@ try {
   informe.datos.totalesCarrito = await evaluar(scriptTexto('aside dl'))
   comprobar('calcula totales', /Total/.test(informe.datos.totalesCarrito || ''), informe.datos.totalesCarrito)
 
+  // Regresión: la miniatura del carrito debe quedar chica y en el mismo renglón
+  // que el texto (si hereda un ancho completo, tapa el nombre y el precio).
+  const medida = await evaluar(`(() => {
+    const li = document.querySelector('aside ul li');
+    const aside = document.querySelector('aside');
+    if (!li || !aside) return null;
+    const caja = li.querySelector('div[class*="aspect-"]');
+    const titulo = li.querySelector('p');
+    if (!caja || !titulo) return null;
+    const a = caja.getBoundingClientRect();
+    const b = titulo.getBoundingClientRect();
+    return {
+      miniatura: Math.round(a.width),
+      renglon: Math.abs(a.top - b.top) < 40,
+      titulo: titulo.innerText.trim().length > 2,
+      anchoPanel: Math.round(aside.getBoundingClientRect().width),
+    };
+  })()`)
+  informe.datos.medidaCarrito = medida
+  comprobar(
+    'la miniatura del carrito no invade el renglón',
+    Boolean(medida) && medida.miniatura <= 120 && medida.renglon && medida.titulo,
+    JSON.stringify(medida),
+  )
+
   /* ------------------------------ 4. checkout ---------------------------- */
   await evaluar(scriptClickTexto('Continuar'))
   await esperar(1000)

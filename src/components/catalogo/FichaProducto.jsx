@@ -63,7 +63,7 @@ export default function FichaProducto({ producto, cantidad = 0, onCerrar, onAgre
       }
     >
       <div className="space-y-5">
-        <ImagenProducto src={urlImagen} srcAlt={urlImagenAlt} alt={titulo} proporcion="aspect-[16/10]" prioridad className="rounded-2xl" />
+        <ImagenProducto src={urlImagen} srcAlt={urlImagenAlt} alt={titulo} proporcion="aspect-[16/10]" prioridad className="w-full rounded-2xl" />
 
         <div className="flex flex-wrap items-end gap-x-3 gap-y-1">
           {precioOferta && (

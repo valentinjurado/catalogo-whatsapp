@@ -73,6 +73,12 @@ try {
   }
 
   await esperar(900)
+  // Esperar a que se vayan los avisos (toasts) para que la captura salga limpia
+  for (let i = 0; i < 20; i++) {
+    const hayAviso = await evaluar("!!document.querySelector('[role=status]')").catch(() => false)
+    if (!hayAviso) break
+    await esperar(500)
+  }
   await nav.captura(salida)
 } finally {
   await nav.cerrar()

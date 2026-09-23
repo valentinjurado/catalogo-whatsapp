@@ -21,7 +21,7 @@ export default function ImagenProducto({
   alt = '',
   prioridad = false,
   proporcion = 'aspect-[4/3]',
-  className = '',
+  className = 'w-full',
 }) {
   const [estado, setEstado] = useState(src ? 'cargando' : 'sin-imagen')
   const [fuente, setFuente] = useState(src || '')
@@ -67,7 +67,9 @@ export default function ImagenProducto({
   const inicial = (alt || '?').trim().charAt(0).toUpperCase() || '?'
 
   return (
-    <div className={`relative w-full ${proporcion} overflow-hidden bg-slate-100 ${className}`}>
+    // El ancho lo define quien lo usa (className): así una miniatura del carrito
+    // (w-20) no hereda el w-full de la tarjeta del menú.
+    <div className={`relative ${proporcion} overflow-hidden bg-slate-100 ${className}`}>
       {(estado === 'cargando' || (reintentando && estado !== 'listo')) && (
         <div className="absolute inset-0 animate-pulse bg-slate-200" aria-hidden="true" />
       )}
