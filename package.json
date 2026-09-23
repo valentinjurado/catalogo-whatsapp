@@ -13,6 +13,7 @@
     "validar": "node scripts/validar-catalogo.mjs",
     "validar:demo": "node scripts/validar-catalogo.mjs public/productos-demo.csv",
     "e2e": "node scripts/e2e.mjs",
+    "publicar:pages": "bash scripts/publicar-pages.sh",
     "privacidad": "node scripts/auditar-privacidad.mjs"
   },
   "dependencies": {
