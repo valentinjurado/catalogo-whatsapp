@@ -163,6 +163,7 @@ def construir(salida):
             ['Base de datos', 'Google Sheets publicado como CSV (solo lectura)'],
             ['Pagos', 'Efectivo al recibir o transferencia bancaria (fuera de la web)'],
             ['Confirmación', 'wa.me/número?text=… con pedido estructurado'],
+            ['Demo online', 'https://valentinjurado.github.io/catalogo-whatsapp/ (catálogo de ejemplo)'],
             ['Hosting', 'Vercel / Netlify / GitHub Pages (plan gratuito)'],
             ['Costo mensual del negocio', 'Dominio (ej. .com.ar) — sin servidores ni licencias'],
             ['Build de producción', '315,7 kB JS (97,0 kB gzip) + 40,1 kB CSS (8,0 kB gzip)'],
