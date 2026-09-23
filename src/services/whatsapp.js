@@ -17,7 +17,13 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
   const L = []
   const { cliente } = pedido
 
-  L.push(`*NUEVO PEDIDO ${pedido.numeroOrden}*`)
+  // La identificación del pedido es el NOMBRE Y APELLIDO del cliente: va en la
+  // primera línea para que el local lo lea en la notificación sin abrir el chat.
+  L.push(`*NUEVO PEDIDO — ${cliente.nombre}*`)
+  // El número de pedido es opcional y arranca apagado (negocio.pedido.mostrarNumeroOrden)
+  if (negocio.pedido?.mostrarNumeroOrden && pedido.numeroOrden) {
+    L.push(`Pedido: ${pedido.numeroOrden}`)
+  }
   L.push(`${negocio.marca.nombre} — ${fechaLegible(pedido.fecha)}`)
   L.push('')
 

@@ -5,6 +5,7 @@ import PasoPago from './PasoPago'
 import PantallaExito from './PantallaExito'
 import { useCarrito } from '../../state/CarritoContext'
 import { useToast } from '../ui/Toast'
+import { NEGOCIO } from '../../config/negocio'
 import { construirPedido, generarNumeroOrden, validarCheckout } from '../../services/pedido'
 import { urlPedidoWhatsapp } from '../../services/whatsapp'
 import { formatearPrecio } from '../../services/formato'
@@ -30,8 +31,11 @@ export default function CheckoutModal({ abierto, onCerrar }) {
   const [paso, setPaso] = useState(1)
   const [errores, setErrores] = useState({})
   const [pedidoEnviado, setPedidoEnviado] = useState(null)
-  // Un número de orden por apertura del checkout
-  const [numeroOrden] = useState(() => generarNumeroOrden())
+  // El pedido se identifica por nombre y apellido. El número de pedido es
+  // opcional (negocio.pedido.mostrarNumeroOrden) y solo se genera si está activo.
+  const [numeroOrden] = useState(() =>
+    NEGOCIO.pedido.mostrarNumeroOrden ? generarNumeroOrden() : null,
+  )
 
   const { items, entrega, pago, datos, totales } = carrito
 
@@ -55,10 +59,13 @@ export default function CheckoutModal({ abierto, onCerrar }) {
 
   const enviarPedido = () => {
     if (!pedido) return
-    carrito.setNumeroOrden(pedido.numeroOrden)
     setPedidoEnviado(pedido)
     setPaso(3)
-    avisar({ titulo: 'Pedido enviado por WhatsApp', detalle: pedido.numeroOrden, tono: 'ok' })
+    avisar({
+      titulo: 'Pedido enviado por WhatsApp',
+      detalle: pedido.cliente.nombre,
+      tono: 'ok',
+    })
   }
 
   const nuevoPedido = () => {

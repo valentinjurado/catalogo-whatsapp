@@ -1,0 +1,89 @@
+{
+  "url": "http://localhost:4173/",
+  "fecha": "2026-09-23T15:22:24.612Z",
+  "checks": {
+    "el checkout llega al paso de forma de pago": {
+      "ok": true,
+      "detalle": ""
+    },
+    "la app solo se conecta a sí misma, al Google Sheet y a las fotos": {
+      "ok": true,
+      "detalle": "2 hosts: localhost, images.unsplash.com"
+    },
+    "el teléfono del cliente no viaja a ningún servidor": {
+      "ok": true,
+      "detalle": "22 peticiones revisadas"
+    },
+    "el teléfono del cliente no queda guardado en el dispositivo": {
+      "ok": true,
+      "detalle": "sin localStorage ni cookies"
+    },
+    "el teléfono no queda escrito en la dirección de la página": {
+      "ok": true,
+      "detalle": ""
+    },
+    "el teléfono solo está dentro del link de WhatsApp que abre el cliente": {
+      "ok": true,
+      "detalle": "https://wa.me/5492494684061"
+    },
+    "el link de WhatsApp no manda la página como referencia (no-referrer)": {
+      "ok": true,
+      "detalle": ""
+    },
+    "los enlaces externos abren aislados (noopener noreferrer)": {
+      "ok": true,
+      "detalle": ""
+    },
+    "el HTML declara una Content-Security-Policy": {
+      "ok": true,
+      "detalle": ""
+    },
+    "la CSP bloquea objetos embebidos y fija la base": {
+      "ok": true,
+      "detalle": ""
+    },
+    "la CSP permite solo el Sheet configurado como conexión externa": {
+      "ok": true,
+      "detalle": ""
+    },
+    "están los archivos de cabeceras para el hosting": {
+      "ok": true,
+      "detalle": "vercel.json + _headers"
+    },
+    "las cabeceras declaran X-Frame-Options": {
+      "ok": true,
+      "detalle": ""
+    },
+    "las cabeceras declaran frame-ancestors": {
+      "ok": true,
+      "detalle": ""
+    },
+    "las cabeceras declaran nosniff": {
+      "ok": true,
+      "detalle": ""
+    },
+    "las cabeceras declaran Referrer-Policy": {
+      "ok": true,
+      "detalle": ""
+    },
+    "las cabeceras declaran Permissions-Policy": {
+      "ok": true,
+      "detalle": ""
+    },
+    "las cabeceras declaran HSTS": {
+      "ok": true,
+      "detalle": ""
+    }
+  },
+  "hosts": [
+    "localhost",
+    "images.unsplash.com"
+  ],
+  "peticiones_totales": 22,
+  "datos_del_cliente": {
+    "en_url": false,
+    "en_dom": false,
+    "en_storage": false
+  },
+  "csp": "default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://docs.google.com https://*.googleusercontent.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+}

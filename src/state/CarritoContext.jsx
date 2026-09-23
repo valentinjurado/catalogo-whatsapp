@@ -53,7 +53,6 @@ export function CarritoProvider({ children }) {
       setEntrega: (entrega) => dispatch({ type: 'SET_ENTREGA', entrega }),
       setPago: (pago) => dispatch({ type: 'SET_PAGO', pago }),
       setDatos: (datos) => dispatch({ type: 'SET_DATOS', datos }),
-      setNumeroOrden: (numeroOrden) => dispatch({ type: 'SET_ORDEN', numeroOrden }),
       sincronizar: (productos) => dispatch({ type: 'SINCRONIZAR', productos }),
     }),
     [],

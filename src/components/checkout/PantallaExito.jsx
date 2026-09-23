@@ -20,11 +20,14 @@ export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) 
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-500">Número de pedido</p>
-        <p className="mt-1 font-mono text-xl font-bold text-slate-900">{pedido.numeroOrden}</p>
+        <p className="text-xs uppercase tracking-wide text-slate-500">Tu pedido</p>
+        <p className="mt-1 text-xl font-bold text-slate-900">{formatearPrecio(pedido.total)}</p>
         <p className="mt-1 text-xs text-slate-500">
-          Total {formatearPrecio(pedido.total)} · {pedido.pagoTexto}
+          {pedido.entregaTexto} · {pedido.pagoTexto}
         </p>
+        {pedido.numeroOrden && (
+          <p className="mt-2 font-mono text-xs text-slate-500">Pedido: {pedido.numeroOrden}</p>
+        )}
       </div>
 
       <div className="grid gap-2 sm:grid-cols-2">

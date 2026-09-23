@@ -12,7 +12,8 @@
     "test": "node scripts/test-servicios.mjs",
     "validar": "node scripts/validar-catalogo.mjs",
     "validar:demo": "node scripts/validar-catalogo.mjs public/productos-demo.csv",
-    "e2e": "node scripts/e2e.mjs"
+    "e2e": "node scripts/e2e.mjs",
+    "privacidad": "node scripts/auditar-privacidad.mjs"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.3.3",

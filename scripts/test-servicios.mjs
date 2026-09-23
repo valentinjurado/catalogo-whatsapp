@@ -217,9 +217,9 @@ t('genera números de orden únicos y con formato legible', () => {
 
 console.log('\nwhatsapp.js')
 
-t('el mensaje incluye número de orden, detalle, totales, entrega y pago', () => {
+t('el mensaje identifica el pedido por nombre y apellido (sin número)', () => {
   const pedido = construirPedido({
-    numeroOrden: 'PED-261004-7K3F',
+    numeroOrden: 'PED-261004-7K3F', // aunque exista, no se muestra si el local no lo activó
     items,
     entrega: 'envio',
     pago: 'transferencia',
@@ -233,14 +233,35 @@ t('el mensaje incluye número de orden, detalle, totales, entrega y pago', () =>
   })
   const mensaje = construirMensajePedido(pedido)
 
-  assert.ok(mensaje.includes('*NUEVO PEDIDO PED-261004-7K3F*'))
+  assert.ok(
+    mensaje.startsWith('*NUEVO PEDIDO — Juan Pérez*'),
+    `la primera línea debe identificar al cliente, llegó: ${mensaje.split('\n')[0]}`,
+  )
+  assert.ok(!mensaje.includes('PED-'), 'sin número de pedido a la vista')
   assert.ok(mensaje.includes(`• ${items[0].cantidad} x Milanesa`))
   assert.ok(mensaje.includes('↳ sin cebolla'))
   assert.ok(mensaje.includes('Envío a domicilio'))
   assert.ok(mensaje.includes('Dirección: Rivadavia 1234, Tandil'))
   assert.ok(mensaje.includes('*Pago*'))
-  assert.ok(mensaje.includes('Nombre: Juan Pérez'.replace('Nombre: ', '')))
+  assert.ok(mensaje.includes('Juan Pérez'))
   assert.ok(mensaje.includes('*TOTAL:'))
+})
+
+t('el número de pedido se puede activar para un local que lo pida', () => {
+  const pedido = construirPedido({
+    numeroOrden: 'PED-261004-7K3F',
+    items,
+    entrega: 'retiro',
+    pago: 'efectivo',
+    datos: { nombre: 'Ana Gómez', telefono: '2494111222', direccion: '', horario: '', aclaraciones: '' },
+  })
+  const negocioConNumero = {
+    ...NEGOCIO,
+    pedido: { ...NEGOCIO.pedido, mostrarNumeroOrden: true },
+  }
+  const mensaje = construirMensajePedido(pedido, negocioConNumero)
+  assert.ok(mensaje.includes('Pedido: PED-261004-7K3F'))
+  assert.ok(mensaje.startsWith('*NUEVO PEDIDO — Ana Gómez*'), 'sigue identificando por nombre')
 })
 
 t('la web no publica datos bancarios: el mensaje avisa que hay que pasar el alias', () => {
@@ -286,7 +307,8 @@ t('el link wa.me está bien formado y codificado', () => {
   assert.match(url, /^https:\/\/wa\.me\/\d+\?text=/)
   assert.ok(!/[\s"]/.test(url), 'no debe quedar ningún espacio ni comilla sin codificar')
   const texto = decodeURIComponent(url.split('?text=')[1])
-  assert.ok(texto.includes('PED-261004-AAAA'))
+  assert.ok(texto.startsWith('*NUEVO PEDIDO — Juan Pérez*'), 'identifica por nombre y apellido')
+  assert.ok(!texto.includes('PED-'), 'sin número de pedido cuando el local no lo pidió')
   assert.ok(texto.includes('Retiro en el local'))
   assert.ok(/Efectivo al recibir el pedido\./.test(texto))
   assert.ok(!texto.toLowerCase().includes('alias'), 'en efectivo no se habla de alias')

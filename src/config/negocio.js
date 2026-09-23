@@ -88,6 +88,10 @@ export const NEGOCIO = {
 
   // ---------- Reglas del pedido ----------
   pedido: {
+    // El pedido se identifica por NOMBRE Y APELLIDO del cliente.
+    // Si el local quiere además un número (PED-260923-4K2M) visible en el
+    // mensaje y en la pantalla final, se pone true acá.
+    mostrarNumeroOrden: false,
     minimo: 0,
     prefijoOrden: 'PED',
     moneda: 'ARS',
@@ -103,7 +107,10 @@ export const NEGOCIO = {
 
   // ---------- Textos ----------
   textos: {
-    pieLegal: 'Los precios pueden variar sin aviso. Las imágenes son ilustrativas.',
+    pieLegal:
+      'Los precios pueden variar sin aviso. Las imágenes son ilustrativas. ' +
+      'Los datos que cargás (nombre, teléfono y dirección) se usan solo para coordinar el pedido: ' +
+      'este sitio no los guarda ni los comparte con terceros.',
   },
 }
 

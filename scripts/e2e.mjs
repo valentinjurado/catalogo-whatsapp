@@ -181,7 +181,6 @@ try {
 
   /* --------------------- 5. link de WhatsApp + cierre -------------------- */
   const href = await evaluar("document.querySelector('[role=dialog] a[href^=\"https://wa.me\"]')?.href")
-  informe.datos.numeroOrden = await evaluar("document.querySelector('[role=dialog] .font-mono')?.innerText || null")
   const texto = href ? decodeURIComponent(href.split('?text=')[1] || '') : ''
   informe.datos.mensaje = texto
 
@@ -192,7 +191,13 @@ try {
     (href || '').split('?')[0],
   )
   comprobar('la URL no tiene espacios ni comillas sin codificar', !/[\s"]/.test(href || ''))
-  comprobar('el mensaje lleva el número de orden', /NUEVO PEDIDO PED-\d{6}-[A-Z0-9]{4}/.test(texto))
+  comprobar(
+    'el mensaje identifica el pedido por nombre y apellido',
+    /^\*NUEVO PEDIDO — Valentin Jurado\*/.test(texto),
+    texto.split('\n')[0],
+  )
+  comprobar('el mensaje no expone ningún número de pedido', !/PED-\d{6}/.test(texto))
+  comprobar('la pantalla tampoco muestra número de pedido', !/PED-\d{6}/.test(await evaluar("document.querySelector('[role=dialog]').innerText")))
   comprobar('el mensaje lleva el detalle con subtotales', /• \d+ x .+ — \$/.test(texto))
   comprobar('el mensaje lleva los totales', /Subtotal:/.test(texto) && /\*TOTAL: \$/.test(texto))
   comprobar('el mensaje lleva la modalidad de entrega', /Envío a domicilio|Retiro en el local/.test(texto) && texto.includes('Rivadavia 1234'))
@@ -209,13 +214,6 @@ try {
   })()`)
   await esperar(1300)
   comprobar('muestra la pantalla de éxito', (await evaluar("document.querySelector('[role=dialog] h2')?.innerText")) === 'Pedido enviado')
-  informe.datos.ordenEnPantalla = await evaluar("document.querySelector('[role=dialog] .font-mono')?.innerText")
-  comprobar(
-    'el número de pedido coincide con el del mensaje',
-    /^PED-\d{6}-[A-Z0-9]{4}$/.test(informe.datos.ordenEnPantalla || '') &&
-      texto.includes(informe.datos.ordenEnPantalla),
-    informe.datos.ordenEnPantalla,
-  )
 
   /* ---------------------------- 6. responsive --------------------------- */
   await evaluar("document.querySelector('[role=dialog] button[aria-label=Cerrar]').click()")

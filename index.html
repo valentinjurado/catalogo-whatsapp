@@ -7,6 +7,24 @@
     <meta name="theme-color" content="#EA580C" />
 
     <!--
+      PRIVACIDAD Y SEGURIDAD (parte que se puede declarar desde el HTML):
+      · no-referrer: el navegador NO manda la dirección de esta página a otros
+        sitios, así el link de WhatsApp (que lleva el mensaje del pedido) nunca
+        viaja como "referer".
+      · CSP: solo se permite cargar código y estilos propios, imágenes por https
+        y conexiones al Google Sheet configurado. Sin scripts de terceros,
+        sin analítica, sin píxeles: no hay a quién filtrarle datos.
+      Las cabeceras que NO se pueden poner desde el HTML (X-Frame-Options,
+      frame-ancestors, HSTS, Permissions-Policy) van en vercel.json y en
+      public/_headers para Netlify/Cloudflare Pages.
+    -->
+    <meta name="referrer" content="no-referrer" />
+    <meta
+      http-equiv="Content-Security-Policy"
+      content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://docs.google.com https://*.googleusercontent.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'"
+    />
+
+    <!--
       Los %DATOS% se reemplazan en el build con los valores de src/config/negocio.js
       (ver el plugin datosDelNegocioEnElHtml en vite.config.js).
     -->

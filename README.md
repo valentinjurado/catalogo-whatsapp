@@ -189,8 +189,8 @@ E2E: `no guarda nada en el dispositivo (sin localStorage/cookies)`.)
 ### Ejemplo del mensaje que le llega al local
 
 ```
-*NUEVO PEDIDO PED-260922-K3MA*
-Pizzería Don Mateo — 22/09/2026 23:40
+*NUEVO PEDIDO — Valentin Jurado*
+Pizzería — 22/09/2026 23:40
 
 *Detalle*
 • 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00
@@ -214,6 +214,11 @@ Valentin Jurado
 Teléfono: 2494 123456
 ```
 
+**El pedido se identifica por nombre y apellido**, no por número: es lo que el local
+necesita en la notificación, y evita inventar códigos que después nadie usa. Si algún local
+lo pide, se activa con una línea (`pedido.mostrarNumeroOrden: true` en `negocio.js`) y
+aparece como una línea más del mensaje, sin cambiar el resto del flujo.
+
 ## 5. Estructura del proyecto
 
 ```
@@ -227,10 +232,13 @@ Teléfono: 2494 123456
 │  └─ generar-pdf-arquitectura.py
 ├─ scripts/
 │  ├─ validar-catalogo.mjs      valida el CSV antes de publicar
-│  ├─ test-servicios.mjs        15 pruebas de la lógica pura
+│  ├─ test-servicios.mjs        21 pruebas de la lógica pura
 │  ├─ cdp.mjs                   conexión CDP reutilizable (sin dependencias)
-│  ├─ e2e.mjs                   flujo de compra completo (38 comprobaciones)
+│  ├─ e2e.mjs                   flujo de compra completo (45 comprobaciones)
+│  ├─ auditar-privacidad.mjs    auditoría de red, datos y cabeceras
 │  └─ capturar.mjs              capturas para la ficha de venta
+├─ vercel.json                  cabeceras de seguridad (Vercel)
+├─ public/_headers              cabeceras de seguridad (Netlify / Cloudflare)
 └─ src/
    ├─ config/
    │  ├─ negocio.js             ⚙️ ÚNICO archivo a editar por local
@@ -274,18 +282,86 @@ El local sólo paga el dominio (por ejemplo `.com.ar`).
 | Prueba | Comando | Resultado |
 |---|---|---|
 | Linter | `npm run lint` | 0 avisos en `src/` y `scripts/` |
-| Lógica pura | `npm test` | 17/17 (precios, totales, envío gratis, validaciones, nº de pedido, mensaje, link, links de Drive, ingredientes) |
-| Menú del cliente | `npm run validar <csv\|url>` | 18/18 productos del demo, 4 categorías, 0 problemas |
-| Compilación | `npm run build` | 305 kB JS (94 kB gzip) + 38 kB CSS (8 kB gzip) |
-| Flujo de compra E2E | `npm run e2e` | 43/43 comprobaciones, repetible entre corridas |
-| Privacidad | incluido en el E2E | no escribe localStorage, sessionStorage ni cookies |
+| Lógica pura | `npm test` | 21/21 (precios, totales, envío gratis, validaciones, mensaje, link, respaldo de imágenes, ingredientes y filtros) |
+| Menú del cliente | `npm run validar <csv\|url>` | 18/18 productos del demo, 4 categorías, 6 filtros, 0 problemas |
+| Compilación | `npm run build` | 306 kB JS (95 kB gzip) + 38 kB CSS (8 kB gzip) |
+| Flujo de compra E2E | `npm run e2e` | 45/45 comprobaciones, repetible entre corridas |
+| Privacidad y seguridad | `npm run privacidad` | 18/18: red, datos del cliente, almacenamiento y cabeceras |
+| Privacidad | incluido arriba | no escribe localStorage, sessionStorage ni cookies |
 | Usabilidad del formulario | incluido en el E2E | escribe letra por letra y verifica que el campo **no pierda el foco** |
 
 El E2E incluye un test específico de usabilidad: escribe letra por letra en el
 formulario y verifica que el campo **no pierda el foco** (`el campo conserva el foco
 mientras se escribe`). Informe en `docs/e2e-resultado.json`.
 
-## 8. Límites conocidos (por diseño)
+## 8. Privacidad y seguridad
+
+### Qué datos del cliente existen y dónde viven
+
+| Dato | Dónde está | Dónde NO está |
+|---|---|---|
+| Nombre y apellido | En la memoria de la página mientras se arma el pedido y en el mensaje de WhatsApp que el cliente envía | No se envía a ningún servidor, no va a la planilla, no se guarda en el dispositivo |
+| Teléfono | Ídem: solo en el mensaje que el cliente manda | No hay base de datos, ni cookies, ni localStorage |
+| Dirección, referencia, horario | Ídem (solo si elige envío a domicilio) | No se publica, no se comparte con terceros |
+
+No hay backend, ni base de datos, ni analítica, ni píxeles de redes sociales: **la web no
+tiene a quién filtrarle datos**, porque no habla con nadie más que con el Google Sheet (solo
+lectura) y con los servidores de las fotos.
+
+### Qué está endurecido (y verificado)
+
+| Protección | Qué hace |
+|---|---|
+| `no-referrer` | El navegador no manda la dirección de la página a otros sitios: el link de WhatsApp (que lleva el pedido) no viaja como referencia |
+| `rel="noopener noreferrer"` | Los enlaces externos abren aislados, sin acceso a la página |
+| CSP (`index.html`) | Solo se ejecuta código y estilos propios; imágenes por https; conexiones únicamente al Sheet configurado. Sin scripts de terceros |
+| `X-Frame-Options: DENY` + `frame-ancestors 'none'` | La web no se puede meter en un iframe ajeno (anti clickjacking) |
+| `X-Content-Type-Options: nosniff` | El navegador no reinterpreta tipos de archivo |
+| `Permissions-Policy` | Cámara, micrófono, ubicación, pagos y USB bloqueados |
+| `Strict-Transport-Security` | Fuerza HTTPS |
+| Escapado de React | Nada de la planilla se inserta como HTML: si alguien escribe código en el Sheet, se muestra como texto |
+| Sin formularios que envíen datos | No hay `<form>` que pueda usar un bot: no hay forma de inyectar spam por la web |
+
+Las cabeceras que no se pueden declarar desde el HTML están en `vercel.json` (Vercel) y en
+`public/_headers` (Netlify / Cloudflare Pages). **GitHub Pages no permite definir cabeceras**:
+ahí valen las de `index.html`, que cubren lo principal (para uso serio, Vercel o Netlify).
+
+### Riesgos que quedan (para saberlos y avisar al local)
+
+- **El número del local es público** (tiene que serlo para que le llegen los pedidos): el spam
+  puede llegar por WhatsApp, no por la web. WhatsApp tiene bloqueo y reporte de contactos.
+- **WhatsApp/Meta procesa el mensaje** con los datos del cliente: eso es ajeno a este proyecto.
+  El local es responsable de esos datos: no reenviarlos ni publicarlos, borrar pedidos viejos.
+- **El link de WhatsApp queda en el historial del propio navegador del cliente** (es su
+  teléfono y su historial; con `no-referrer` esa dirección no se filtra a terceros).
+- **Quien tenga permiso de edición en la planilla** puede cambiar precios y textos: proteger la
+  cuenta de Google con verificación en dos pasos y no compartir la hoja como editable.
+- **La hoja publicada como CSV es pública**: los datos internos (costos, márgenes, notas) van
+  en otra pestaña que no se publica.
+- **Si una foto apunta a un servidor de terceros**, ese servidor ve la IP del visitante: usar
+  Drive, el hosting propio o un servicio de imágenes conocido.
+
+### Ley 25.326 (Protección de Datos Personales, Argentina)
+
+El criterio del proyecto es **minimizar**: la web no recolecta, no almacena y no transmite los
+datos a ningún servidor propio. Los datos llegan al local por WhatsApp y quedan bajo su
+responsabilidad. El texto del pie ya lo declara:
+
+> Los datos que cargás (nombre, teléfono y dirección) se usan solo para coordinar el pedido:
+> este sitio no los guarda ni los comparte con terceros.
+
+### Cómo se audita (repetible)
+
+```bash
+npm run privacidad     # 18 comprobaciones en un navegador real
+```
+
+Recorre el flujo de compra completo mientras registra la red y verifica: a qué hosts se conecta
+la app, que el teléfono del cliente no viaje a ningún servidor, que no quede en cookies ni en
+localStorage, que no esté en la URL, que solo aparezca dentro del link de WhatsApp, y que el
+HTML y los archivos de hosting declaren todas las cabeceras. Informe: `docs/privacidad-resultado.json`.
+
+## 9. Límites conocidos (por diseño)
 
 - No hay stock en tiempo real ni reserva: **el stock se actualiza a mano en la planilla** (ver arriba)
   y el local confirma por WhatsApp.

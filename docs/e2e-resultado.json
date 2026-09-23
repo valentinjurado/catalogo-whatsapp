@@ -1,6 +1,6 @@
 {
- "url": "https://valentinjurado.github.io/catalogo-whatsapp/",
- "fecha": "2026-09-23T14:37:15.397Z",
+ "url": "http://localhost:4173/",
+ "fecha": "2026-09-23T15:20:02.196Z",
  "checks": {
   "no guarda nada en el dispositivo (sin localStorage/cookies)": {
    "ok": true,
@@ -130,7 +130,15 @@
    "ok": true,
    "detalle": ""
   },
-  "el mensaje lleva el número de orden": {
+  "el mensaje identifica el pedido por nombre y apellido": {
+   "ok": true,
+   "detalle": "*NUEVO PEDIDO — Valentin Jurado*"
+  },
+  "el mensaje no expone ningún número de pedido": {
+   "ok": true,
+   "detalle": ""
+  },
+  "la pantalla tampoco muestra número de pedido": {
    "ok": true,
    "detalle": ""
   },
@@ -161,10 +169,6 @@
   "muestra la pantalla de éxito": {
    "ok": true,
    "detalle": ""
-  },
-  "el número de pedido coincide con el del mensaje": {
-   "ok": true,
-   "detalle": "PED-260923-YAPK"
   },
   "en celular aparece la barra de pedido": {
    "ok": true,
@@ -207,14 +211,12 @@
    "efectivo",
    "transferencia"
   ],
-  "numeroOrden": null,
-  "mensaje": "*NUEVO PEDIDO PED-260923-YAPK*\nPizzería — 23/09/2026 11:37\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
-  "ordenEnPantalla": "PED-260923-YAPK",
+  "mensaje": "*NUEVO PEDIDO — Valentin Jurado*\nPizzería — 23/09/2026 12:20\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
   "barraMovil": "4 | Ver mi pedido | $ 43.100,00"
  },
  "resumen": {
-  "total": 44,
-  "ok": 44,
+  "total": 45,
+  "ok": 45,
   "fallos": []
  }
 }

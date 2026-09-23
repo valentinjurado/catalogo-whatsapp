@@ -540,7 +540,7 @@ export function construirUrlWhatsapp(mensaje, numero = NEGOCIO.whatsapp.numero) 
 
     historia.append(P('Mensaje real generado durante la verificación', 'h2'))
     historia.append(codigo("""
-*NUEVO PEDIDO PED-260922-K3MA*
+*NUEVO PEDIDO — Valentin Jurado*
 Pizzería — 22/09/2026 23:40
 
 *Detalle*
@@ -569,6 +569,12 @@ Teléfono: 2494 123456
         '(<font face="Courier" size="8">pago.transferencia.lineaMensaje</font>) y, cuando el cliente '
         'elige transferencia, el propio pedido le avisa al local que tiene que pasar el alias. Si '
         'elige efectivo, la línea dice que se abona al recibir.', 'chico'))
+    historia.append(P(
+        '<b>Identificación:</b> el pedido se reconoce por el <b>nombre y apellido</b> del cliente, que '
+        'viaja en la primera línea (así el local lo lee en la notificación sin abrir el chat). El '
+        'número de pedido es opcional y viene apagado: si un local lo pide, se activa con '
+        '<font face="Courier" size="8">pedido.mostrarNumeroOrden: true</font> y aparece como una '
+        'línea más, sin tocar el resto del flujo.', 'chico'))
 
     historia.append(P('Pantallas del flujo de pago (sólo se elige cómo pagar)', 'h2'))
     historia.extend(bullets([
@@ -613,17 +619,20 @@ catalogo-whatsapp/
 │  └─ generar-pdf-arquitectura.py generador de este PDF
 ├─ scripts/
 │  ├─ validar-catalogo.mjs        valida tu CSV con el mismo parser de la web
-│  ├─ test-servicios.mjs          14 pruebas de la lógica pura (sin navegador)
+│  ├─ test-servicios.mjs          21 pruebas de la lógica pura (sin navegador)
 │  ├─ cdp.mjs                     conexión CDP reutilizable (capturas y E2E)
-│  ├─ e2e.mjs                     flujo de compra completo: 35 comprobaciones
+│  ├─ e2e.mjs                     flujo de compra completo: 45 comprobaciones
+│  ├─ auditar-privacidad.mjs      auditoría de red, datos del cliente y cabeceras
 │  └─ capturar.mjs                capturas de pantalla para la ficha de venta
+├─ vercel.json                    cabeceras de seguridad (Vercel)
+├─ public/_headers                cabeceras de seguridad (Netlify / Cloudflare Pages)
 └─ src/
    ├─ config/
    │  ├─ negocio.js        ⚙️  ÚNICO archivo que se edita por cliente
    │  └─ paletas.js        6 paletas de color aplicadas en runtime (CSS vars)
    ├─ services/            lógica sin React, testeable
    │  ├─ catalogo.js        CSV de Sheets → JSON (+ caché + errores claros)
-   │  ├─ pedido.js          totales, envío, nº de orden, validaciones
+   │  ├─ pedido.js          totales, envío, validaciones
    │  ├─ whatsapp.js        mensaje estructurado + link wa.me
    │  └─ formato.js         precios, fechas, normalización de texto
    ├─ state/
@@ -663,6 +672,7 @@ catalogo-whatsapp/
         ['Origen de productos', 'catalogo.hojaCsv o hojaId+gid', 'Se conecta el Sheet del cliente'],
         ['Envío', 'entrega.envio.* / entrega.retiro.*', 'Costo, envío gratis desde X, zona, demora, dirección y horarios'],
         ['Formas de pago', 'pago.efectivo / pago.transferencia', 'Qué se ofrece al cliente y qué línea va al mensaje (acá se decide si hay que pasar el alias)'],
+        ['Identificación del pedido', 'pedido.mostrarNumeroOrden', 'Nombre y apellido del cliente por defecto; el número de pedido es opcional (apagado)'],
         ['Formulario', 'pedido.campos.*', 'Qué se le pide al cliente (dirección sólo si hay envío)'],
         ['Textos', 'textos.*', 'Pie legal, sin buscar en componentes'],
         ],
@@ -685,13 +695,63 @@ catalogo-whatsapp/
             ['XSS desde la planilla', 'Mitigado', 'React escapa todo texto interpolado; no se usa innerHTML ni dangerouslySetInnerHTML.'],
             ['Manipulación de precios', 'Mitigado', 'El total se recalcula desde los precios del catálogo; el mensaje lleva el detalle para que el local lo verifique.'],
             ['Spam de pedidos', 'Bajo', 'No hay endpoint que atacar: el peor caso es un mensaje de WhatsApp, que el local puede bloquear.'],
-            ['Caída de Google Sheets', 'Mitigado', 'Caché local del último catálogo: la tienda sigue mostrando productos.'],
+            ['Caída de Google Sheets', 'Mitigado', 'Caché en memoria del último menú: durante la visita se sigue mostrando lo ya cargado, sin escribir nada en el dispositivo.'],
         ],
         [3.9 * cm, 1.9 * cm, 11.2 * cm]))
 
+    historia.append(P('Privacidad: dónde viven los datos del cliente', 'h2'))
+    historia.append(tabla(
+        ['Dato', 'Dónde está', 'Dónde NO está'],
+        [
+            ['Nombre y apellido', 'En la memoria de la página mientras se arma el pedido y en el mensaje de WhatsApp que el cliente envía', 'No se transmite a ningún servidor, no va a la planilla, no se guarda en el dispositivo'],
+            ['Teléfono', 'Ídem: solo dentro del mensaje que el cliente manda', 'Sin base de datos, sin cookies, sin localStorage'],
+            ['Dirección, referencia y horario', 'Ídem (solo si elige envío a domicilio)', 'No se publica ni se comparte con terceros'],
+        ],
+        [3.4 * cm, 6.9 * cm, 6.7 * cm]))
+    historia.append(P(
+        'No hay backend, ni base de datos, ni analítica, ni píxeles de redes sociales: la web no '
+        'habla con nadie más que con el Google Sheet (solo lectura) y con los servidores de las '
+        'fotos. Por eso no hay a quién filtrarle datos.', 'chico'))
+
+    historia.append(P('Qué está endurecido', 'h2'))
+    historia.extend(bullets([
+        '<b>Política de referencia <i>no-referrer</i>:</b> el navegador no manda la dirección de la '
+        'página a otros sitios, así el link de WhatsApp (que lleva el pedido) no viaja como referencia.',
+        '<b>Content-Security-Policy:</b> solo se ejecuta código y estilos propios, las imágenes van por '
+        'https y las conexiones se limitan al Sheet configurado. Sin scripts de terceros.',
+        '<b>Cabeceras de hosting</b> (<font face="Courier" size="8">vercel.json</font> y '
+        '<font face="Courier" size="8">public/_headers</font>): X-Frame-Options DENY, '
+        'frame-ancestors none (anti clickjacking), nosniff, Permissions-Policy (cámara, micrófono, '
+        'ubicación y pagos bloqueados) y HSTS para forzar HTTPS.',
+        '<b>Enlaces externos aislados:</b> todos con <font face="Courier" size="8">noopener '
+        'noreferrer</font>.',
+        '<b>Sin formularios que envíen datos:</b> no hay ningún <i>form</i> que un bot pueda usar, así '
+        'que no hay vía para inyectar spam desde la web.',
+        '<b>Escapado de React:</b> nada de la planilla se inserta como HTML; si alguien escribe código '
+        'en el Sheet, se muestra como texto.',
+    ]))
+
+    historia.append(P('Riesgos que quedan (para avisarlos, no para ocultarlos)', 'h2'))
+    historia.extend(bullets([
+        '<b>El número del local es público</b> (necesario para recibir pedidos): el spam puede llegar '
+        'por WhatsApp, no por la web. WhatsApp tiene bloqueo y reporte.',
+        '<b>WhatsApp/Meta procesa el mensaje</b> con los datos del cliente: queda bajo la '
+        'responsabilidad del local no reenviarlos ni publicarlos y borrar pedidos viejos.',
+        '<b>El link de WhatsApp queda en el historial del navegador del propio cliente</b> (su '
+        'teléfono, su historial); con <i>no-referrer</i> esa dirección no se filtra a terceros.',
+        '<b>Quien edite la planilla</b> puede cambiar precios y textos: cuenta de Google con '
+        'verificación en dos pasos y hoja compartida solo con quien corresponda.',
+        '<b>La hoja publicada como CSV es pública</b>: costos, márgenes y notas internas van en otra '
+        'pestaña que no se publica.',
+        '<b>Fotos en servidores de terceros:</b> ese servidor ve la IP del visitante. Conviene Drive, '
+        'el hosting propio o un servicio de imágenes conocido.',
+        '<b>Marco legal (Ley 25.326):</b> el criterio del proyecto es minimizar. La web no recolecta '
+        'ni almacena datos; el pie de página ya declara que se usan solo para coordinar el pedido.',
+    ]))
+
     historia.append(P('Rendimiento', 'h2'))
     historia.extend(bullets([
-        '<b>Peso real medido:</b> 315,7 kB de JavaScript (97,0 kB gzip) y 40,1 kB de CSS (8,0 kB gzip). '
+        '<b>Peso real medido:</b> 306 kB de JavaScript (95 kB gzip) y 37,6 kB de CSS (7,8 kB gzip). '
         'Una sola petición de datos: el CSV del Sheet (el resto queda en caché del navegador).',
         '<b>Sin dependencias pesadas:</b> solo React, Tailwind y PapaParse. Cero librerías de UI, de '
         'iconos o de estado (los iconos son SVG inline).',
@@ -710,7 +770,9 @@ npm install           # instala React, Vite, Tailwind y PapaParse
 # 1. editar src/config/negocio.js (marca, whatsapp, envío, pago, hoja)
 npm run validar public/productos-demo.csv    # valida la planilla del cliente
 npm run lint          # oxlint: 0 avisos esperados
-npm test              # 14 pruebas de pedido, totales, parseo y mensaje
+npm test              # 21 pruebas de pedido, totales, parseo, mensaje y respaldos
+npm run e2e           # flujo de compra completo en un navegador real (45 comprobaciones)
+npm run privacidad    # audita red, datos del cliente y cabeceras (18 comprobaciones)
 npm run dev           # desarrollo en http://localhost:5173
 npm run build         # genera dist/ (paquete estatico listo para publicar)
 npm run preview       # sirve dist/ localmente (puerto 4173)
@@ -743,16 +805,17 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
         [
             ['Linter (oxlint)', 'OK — 0 avisos en src/ y scripts/'],
             ['Compilación de producción', 'OK — 48 módulos, build en ~1 s'],
-            ['Pruebas de lógica (npm test)', 'OK — 17/17 (precios, totales, envío, validaciones, nº de pedido, mensaje, link, links de Drive, ingredientes y etiquetas)'],
+            ['Pruebas de lógica (npm test)', 'OK — 21/21 (precios, totales, envío, validaciones, mensaje, link, respaldos de imagen, ingredientes y filtros)'],
             ['Validador del menú (npm run validar)', 'OK — 18 productos, 4 categorías, 6 filtros rápidos, 0 problemas'],
-            ['Fotos del menú', '40 URLs verificadas (HTTP 200); 18/18 cargan y se pintan (600×450)'],
-            ['E2E navegador real (npm run e2e)', 'OK — 43/43 comprobaciones, repetible entre corridas'],
-            ['Privacidad del dispositivo', 'OK — el E2E comprueba localStorage, sessionStorage y cookies en cero'],
+            ['Fotos del menú', '41 URLs verificadas (HTTP 200); 18/18 cargan y se pintan (600×450)'],
+            ['E2E navegador real (npm run e2e)', 'OK — 45/45 comprobaciones, repetible entre corridas'],
+            ['Auditoría de privacidad (npm run privacidad)', 'OK — 18/18: red, datos del cliente, almacenamiento y cabeceras'],
+            ['Privacidad del dispositivo', 'OK — localStorage, sessionStorage y cookies en cero; el teléfono del cliente no viaja a ningún servidor'],
             ['Ficha de producto', 'OK — abre desde la tarjeta, muestra ingredientes y agrega al pedido'],
             ['Filtros rápidos', 'OK — los chips salen de la columna etiquetas (Vegetariano, Vegano…)'],
+            ['Respaldo de imágenes', 'OK — con un link roto: pide el primero, pide el segundo y muestra la foto'],
             ['Bug de usabilidad (foco al escribir)', 'Corregido y verificado: el campo conserva el foco en cada tecla'],
-            ['Sin datos bancarios', 'Verificado: la pantalla de pago y el mensaje no contienen alias, CBU ni CVU'],
-            ['Link de WhatsApp', 'OK — wa.me con el mensaje codificado completo y sin espacios sin codificar'],
+            ['Sin datos bancarios ni número de pedido', 'Verificado: ni la pantalla ni el mensaje los exponen'],
             ['Responsive', 'OK — capturas en 1440×900 y 390×844 con barra de pedido fija en el celular'],
         ],
         [6.4 * cm, 10.6 * cm]))

@@ -29,7 +29,6 @@ export const estadoInicial = {
     horario: '',
     aclaraciones: '',
   },
-  numeroOrden: null,
   ficha: null, // producto abierto en la ficha de detalle
 }
 
@@ -107,7 +106,7 @@ export function carritoReducer(estado, accion) {
     }
 
     case 'VACIAR':
-      return { ...estado, items: [], numeroOrden: null }
+      return { ...estado, items: [] }
 
     case 'SET_ENTREGA':
       return { ...estado, entrega: accion.entrega }
@@ -117,9 +116,6 @@ export function carritoReducer(estado, accion) {
 
     case 'SET_DATOS':
       return { ...estado, datos: { ...estado.datos, ...accion.datos } }
-
-    case 'SET_ORDEN':
-      return { ...estado, numeroOrden: accion.numeroOrden }
 
     /**
      * Refresca precios/disponibilidad con la última versión del menú, conservando

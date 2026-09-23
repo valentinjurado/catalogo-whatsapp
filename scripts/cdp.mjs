@@ -17,7 +17,7 @@ export const esperar = (ms) => new Promise((r) => setTimeout(r, ms))
  * Abre una pestaña, la deja navegada y devuelve helpers para manejarla.
  * @returns {Promise<{evaluar, navegar, esperarSelector, captura, cerrar, cerrarPestania}>}
  */
-export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = false, sinCache = false } = {}) {
+export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = false, sinCache = false, capturarRed = false } = {}) {
   const version = await (await fetch(`${CDP_HTTP}/json/version`)).json()
   console.log('Navegador:', version.Browser)
 
@@ -37,8 +37,18 @@ export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = fa
 
   let idSeq = 0
   const pendientes = new Map()
+  // Si se pide auditar la red, se guarda cada petición que sale del navegador
+  const listaRed = capturarRed ? [] : null
   ws.addEventListener('message', (evento) => {
     const msg = JSON.parse(evento.data)
+    // Eventos (no respuestas): se usan para auditar a qué hosts se conecta la app
+    if (msg.method && listaRed && msg.method === 'Network.requestWillBeSent') {
+      listaRed.push({
+        url: msg.params?.request?.url || '',
+        tipo: msg.params?.type || msg.params?.request?.resourceType || '',
+      })
+      return
+    }
     const pendiente = pendientes.get(msg.id)
     if (!pendiente) return
     pendientes.delete(msg.id)
@@ -77,8 +87,10 @@ export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = fa
 
   // Datos frescos: el perfil del navegador conserva el CSV en su caché de disco,
   // así que en las pruebas que dependen del contenido se apaga la caché HTTP.
-  if (sinCache) {
+  if (sinCache || capturarRed) {
     await enviar('Network.enable').catch(() => {})
+  }
+  if (sinCache) {
     await enviar('Network.setCacheDisabled', { cacheDisabled: true }).catch(() => {})
     await enviar('Network.clearBrowserCache').catch(() => {})
   }
@@ -97,6 +109,12 @@ export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = fa
     await cerrarPestania()
   }
 
+  /**
+   * Peticiones de red observadas (host, tipo). Sólo con capturarRed: true.
+   * Se devuelve una copia para que el llamador no altere el registro.
+   */
+  const peticiones = () => (listaRed ? [...listaRed] : [])
+
   await enviar('Page.enable')
   await enviar('Runtime.enable')
   await enviar('Emulation.setDeviceMetricsOverride', {
@@ -107,7 +125,7 @@ export async function abrirNavegador({ url, ancho = 1440, alto = 900, movil = fa
   })
   if (url) await enviar('Page.navigate', { url })
 
-  return { enviar, evaluar, esperarSelector, captura, cerrar, cerrarPestania, target }
+  return { enviar, evaluar, esperarSelector, captura, cerrar, cerrarPestania, peticiones, target }
 }
 
 /**
