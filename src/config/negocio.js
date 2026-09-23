@@ -27,7 +27,7 @@ export const NEGOCIO = {
   whatsapp: {
     // ⚠️ PONÉ ACÁ TU NÚMERO PARA PROBAR: formato internacional SIN +, espacios
     //    ni guiones. Argentina: 54 9 <área> <número>  ->  '5492494123456'
-    numero: '5492494684061',
+    numero: '2494684061',
     // Se usa en el saludo del mensaje de consulta
     nombreVendedor: 'Mateo',
   },
