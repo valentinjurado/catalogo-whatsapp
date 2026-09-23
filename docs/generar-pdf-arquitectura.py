@@ -535,7 +535,7 @@ export function construirUrlWhatsapp(mensaje, numero = NEGOCIO.whatsapp.numero) 
     historia.append(P('Mensaje real generado durante la verificación', 'h2'))
     historia.append(codigo("""
 *NUEVO PEDIDO PED-260922-K3MA*
-Pizzería Don Mateo — 22/09/2026 23:40
+Pizzería — 22/09/2026 23:40
 
 *Detalle*
 • 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00
@@ -653,7 +653,7 @@ catalogo-whatsapp/
         [
         ['Nombre, eslogan, logo', 'marca.*', 'Encabezado, pie, título de la página (SEO)'],
         ['Paleta y redondeo', 'marca.tema / marca.radio', '6 paletas listas: naranja, verde, azul, bordo, violeta, grafito'],
-        ['Número de WhatsApp', 'whatsapp.numero / nombreVendedor', 'Destino de todos los pedidos y saludo del mensaje'],
+        ['Número de WhatsApp', 'whatsapp.numero / nombreVendedor', 'Destino de todos los pedidos. Formato internacional: 549 + área + número'],
         ['Origen de productos', 'catalogo.hojaCsv o hojaId+gid', 'Se conecta el Sheet del cliente'],
         ['Envío', 'entrega.envio.* / entrega.retiro.*', 'Costo, envío gratis desde X, zona, demora, dirección y horarios'],
         ['Formas de pago', 'pago.efectivo / pago.transferencia', 'Qué se ofrece al cliente y qué línea va al mensaje (acá se decide si hay que pasar el alias)'],

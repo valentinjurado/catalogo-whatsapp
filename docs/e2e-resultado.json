@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:4173/",
- "fecha": "2026-09-23T14:01:24.768Z",
+ "fecha": "2026-09-23T14:04:36.412Z",
  "checks": {
   "no guarda nada en el dispositivo (sin localStorage/cookies)": {
    "ok": true,
@@ -120,7 +120,11 @@
   },
   "el enlace apunta a wa.me con el número configurado": {
    "ok": true,
-   "detalle": "https://wa.me/5490000000000"
+   "detalle": "https://wa.me/5492494684061"
+  },
+  "el número está en formato internacional (con código de país)": {
+   "ok": true,
+   "detalle": "https://wa.me/5492494684061"
   },
   "la URL no tiene espacios ni comillas sin codificar": {
    "ok": true,
@@ -160,7 +164,7 @@
   },
   "el número de pedido coincide con el del mensaje": {
    "ok": true,
-   "detalle": "PED-260923-FWRK"
+   "detalle": "PED-260923-55E6"
   },
   "en celular aparece la barra de pedido": {
    "ok": true,
@@ -204,13 +208,13 @@
    "transferencia"
   ],
   "numeroOrden": null,
-  "mensaje": "*NUEVO PEDIDO PED-260923-FWRK*\nPizzería Don Mateo — 23/09/2026 11:01\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
-  "ordenEnPantalla": "PED-260923-FWRK",
+  "mensaje": "*NUEVO PEDIDO PED-260923-55E6*\nPizzería — 23/09/2026 11:04\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
+  "ordenEnPantalla": "PED-260923-55E6",
   "barraMovil": "4 | Ver mi pedido | $ 43.100,00"
  },
  "resumen": {
-  "total": 43,
-  "ok": 43,
+  "total": 44,
+  "ok": 44,
   "fallos": []
  }
 }
