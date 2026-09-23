@@ -1,6 +1,6 @@
 {
-  "url": "http://localhost:4173/",
-  "fecha": "2026-09-23T15:34:14.802Z",
+  "url": "https://catalogo-whatsapp-nexa-kofi.vercel.app/",
+  "fecha": "2026-09-23T15:52:15.528Z",
   "checks": {
     "el checkout llega al paso de forma de pago": {
       "ok": true,
@@ -8,7 +8,7 @@
     },
     "la app solo se conecta a sí misma, al Google Sheet y a las fotos": {
       "ok": true,
-      "detalle": "2 hosts: localhost, images.unsplash.com"
+      "detalle": "2 hosts: catalogo-whatsapp-nexa-kofi.vercel.app, images.unsplash.com"
     },
     "el teléfono del cliente no viaja a ningún servidor": {
       "ok": true,
@@ -73,10 +73,38 @@
     "las cabeceras declaran HSTS": {
       "ok": true,
       "detalle": ""
+    },
+    "la URL publicada responde": {
+      "ok": true,
+      "detalle": "HTTP 200"
+    },
+    "el servidor envía Content-Security-Policy": {
+      "ok": true,
+      "detalle": "default-src 'self'; script-src 'self'; style-src 'self' 'uns"
+    },
+    "el servidor envía X-Frame-Options": {
+      "ok": true,
+      "detalle": "deny"
+    },
+    "el servidor envía X-Content-Type-Options": {
+      "ok": true,
+      "detalle": "nosniff"
+    },
+    "el servidor envía Referrer-Policy": {
+      "ok": true,
+      "detalle": "no-referrer"
+    },
+    "el servidor envía Permissions-Policy": {
+      "ok": true,
+      "detalle": "geolocation=(), microphone=(), camera=(), payment=(), usb=()"
+    },
+    "el servidor envía Strict-Transport-Security": {
+      "ok": true,
+      "detalle": "max-age=31536000; includesubdomains"
     }
   },
   "hosts": [
-    "localhost",
+    "catalogo-whatsapp-nexa-kofi.vercel.app",
     "images.unsplash.com"
   ],
   "peticiones_totales": 22,

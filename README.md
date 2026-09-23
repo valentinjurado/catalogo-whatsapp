@@ -6,7 +6,8 @@ WhatsApp. **Sin base de datos, sin backend, sin pasarela de pago y sin datos
 bancarios publicados.** El panel de administración es un Google Sheet y el sitio es
 estático (se publica gratis en Vercel, Netlify o GitHub Pages).
 
-**Demo:** https://valentinjurado.github.io/catalogo-whatsapp/
+**Demo:** https://catalogo-whatsapp-nexa-kofi.vercel.app/ (Vercel, con las cabeceras de seguridad activas)
+**Espejo:** https://valentinjurado.github.io/catalogo-whatsapp/ (GitHub Pages, sin cabeceras propias)
 
 ```
 Cliente                                    Dueño del local
@@ -286,7 +287,9 @@ El local sólo paga el dominio (por ejemplo `.com.ar`).
 | Menú del cliente | `npm run validar <csv\|url>` | 18/18 productos del demo, 4 categorías, 6 filtros, 0 problemas |
 | Compilación | `npm run build` | 306 kB JS (95 kB gzip) + 38 kB CSS (8 kB gzip) |
 | Flujo de compra E2E | `npm run e2e` | 45/45 comprobaciones, repetible entre corridas |
-| Privacidad y seguridad | `npm run privacidad` | 18/18: red, datos del cliente, almacenamiento y cabeceras |
+| Privacidad y seguridad | `npm run privacidad` | 18/18 local (red, datos del cliente, almacenamiento y archivos de cabeceras) |
+| Cabeceras servidas | `npm run privacidad -- <url>` | 24/24 contra la demo en Vercel: CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy y HSTS activos |
+| Demo en producción | `npm run e2e -- <url>` | 45/45 contra https://catalogo-whatsapp-nexa-kofi.vercel.app |
 | Privacidad | incluido arriba | no escribe localStorage, sessionStorage ni cookies |
 | Usabilidad del formulario | incluido en el E2E | escribe letra por letra y verifica que el campo **no pierda el foco** |
 
@@ -361,7 +364,62 @@ la app, que el teléfono del cliente no viaje a ningún servidor, que no quede e
 localStorage, que no esté en la URL, que solo aparezca dentro del link de WhatsApp, y que el
 HTML y los archivos de hosting declaren todas las cabeceras. Informe: `docs/privacidad-resultado.json`.
 
-## 9. Límites conocidos (por diseño)
+## 10. Hosting: cuál conviene y cuánto sale
+
+Los tres sirven para este proyecto (es un paquete estático). Lo que cambia es el precio, el
+límite de tráfico y —lo más importante acá— **si se pueden definir las cabeceras de seguridad**.
+
+| | Plan gratis | Cabeceras propias | Uso comercial en el plan gratis | Plan pago más barato |
+|---|---|---|---|---|
+| **Vercel** | 100 GB/mes de tráfico | Sí (`vercel.json`) | **No**: su política de uso justo dice que Hobby es "solo para uso personal no comercial" y todo uso comercial requiere Pro o Enterprise | Pro: **US$20/mes** (por usuario, con US$20 de crédito de uso incluido) |
+| **Netlify** | Incluye tráfico y builds con un sistema de créditos | Sí (`public/_headers`) | **Sí** | Pro: **US$9/mes** (1 miembro); US$20/mes con miembros ilimitados |
+| **Cloudflare Pages** | 500 builds/mes, almacenamiento y salida sin costo ("egress-free") | Sí (`public/_headers`) | **Sí** | No hace falta para un sitio estático |
+
+(Datos tomados de las páginas de precios y de la política de uso justo de cada proveedor,
+verificados al momento de escribir esto; los precios cambian, conviene reconfirmarlos.)
+
+### Recomendación práctica
+
+- **Para mostrar a clientes (esta demo):** está publicada en **Vercel**, que es la que ya
+  tenés configurada. Mientras sea una demo de venta y no un sitio comercial en producción,
+  el plan Hobby alcanza. Si la querés usar como vidriera de un negocio que ya factura, va a
+  Pro o mejor moverla.
+- **Para el sitio de cada local (lo que se cobra):** **Netlify** o **Cloudflare Pages**, porque
+  su plan gratis **sí permite uso comercial** y las cabeceras se aplican igual. Si el local
+  necesita más, Netlify Pro arranca en **US$9/mes**, la mitad que Vercel Pro.
+- **Desventaja de GitHub Pages:** no permite definir cabeceras, solo las que se pueden
+  declarar desde el HTML (referrer y CSP). Sirve como espejo, no como hosting serio.
+
+### Cómo se publica (comandos)
+
+```bash
+# Vercel (lo que usa esta demo): instala la CLI, entra y publica
+npm i -g vercel
+vercel login          # una vez
+vercel deploy --prod  # cada vez
+
+# Netlify: con un token personal (app.netlify.com → User settings → Applications)
+npm i -g netlify-cli
+netlify deploy --prod --dir=dist --auth=<TU_TOKEN> --site=<NOMBRE_DEL_SITIO>
+
+# Cloudflare Pages: se conecta el repo de GitHub desde el panel (build: npm run build, salida: dist)
+```
+
+**Importante al publicar en Vercel:** si el proyecto tiene activada la *Deployment Protection*
+(«Vercel Authentication»), el sitio responde 302 al login y no lo ve nadie. Se desactiva en
+Project → Settings → Deployment Protection, o por API (`ssoProtection: null`).
+
+### Cómo se comprueba que las cabeceras están puestas
+
+```bash
+npm run privacidad -- https://tu-sitio.com
+```
+
+Contra una URL publicada, el auditor agrega 7 comprobaciones sobre las cabeceras **reales del
+servidor** (CSP, X-Frame-Options, nosniff, Referrer-Policy, Permissions-Policy y HSTS) además de
+las 18 que corre siempre. Resultado de esta demo en Vercel: 24/24.
+
+## 11. Límites conocidos (por diseño)
 
 - No hay stock en tiempo real ni reserva: **el stock se actualiza a mano en la planilla** (ver arriba)
   y el local confirma por WhatsApp.

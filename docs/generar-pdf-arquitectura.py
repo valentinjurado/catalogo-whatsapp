@@ -165,10 +165,10 @@ def construir(salida):
             ['Administración', 'El propio Google Sheet: alta, edición, baja y stock'],
             ['Pagos', 'Efectivo o transferencia. La web no publica alias ni CBU: el local lo pasa por el chat'],
             ['Confirmación', 'wa.me/número?text=… con el pedido estructurado'],
-            ['Demo online', 'https://valentinjurado.github.io/catalogo-whatsapp/ (menú de ejemplo)'],
-            ['Hosting', 'Vercel / Netlify / GitHub Pages (plan gratuito)'],
+            ['Demo online', 'https://catalogo-whatsapp-nexa-kofi.vercel.app/ (Vercel, cabeceras activas)'],
+            ['Hosting', 'Vercel / Netlify / Cloudflare Pages / GitHub Pages (plan gratuito)'],
             ['Costo mensual del local', 'Dominio (ej. .com.ar) — sin servidores ni licencias'],
-            ['Build de producción', '300,7 kB JS (93,5 kB gzip) + 37,5 kB CSS (7,7 kB gzip)'],
+            ['Build de producción', '306,3 kB JS (95,1 kB gzip) + 37,6 kB CSS (7,8 kB gzip)'],
             ['Fecha del documento', date.today().strftime('%d/%m/%Y')],
         ],
         [4.2 * cm, 12.8 * cm]))
@@ -782,16 +782,35 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
 
     historia.append(P('Publicación con hosting gratuito', 'h2'))
     historia.extend(bullets([
-        '<b>Vercel:</b> <font face="Courier" size="8">npx vercel deploy --prod</font> '
-        '(framework Vite, salida dist). Dominio propio desde el panel.',
+        '<b>Vercel:</b> <font face="Courier" size="8">vercel deploy --prod</font> (framework Vite, '
+        'salida dist). Ojo con la <i>Deployment Protection</i>: si está activa, el sitio responde 302 '
+        'al login y no lo ve nadie. Se desactiva en Settings → Deployment Protection.',
         '<b>Netlify:</b> arrastrar la carpeta <font face="Courier" size="8">dist/</font> al panel, o '
-        '<font face="Courier" size="8">npx netlify deploy --prod --dir=dist</font>.',
-        '<b>GitHub Pages:</b> subir el contenido de dist a la rama gh-pages. El proyecto ya compila con '
-        'rutas relativas, así que también funciona en subcarpetas de usuario.',
+        '<font face="Courier" size="8">netlify deploy --prod --dir=dist</font> con un token personal.',
+        '<b>Cloudflare Pages:</b> conectar el repo de GitHub desde el panel (build '
+        '<font face="Courier" size="8">npm run build</font>, salida <font face="Courier" size="8">dist</font>).',
+        '<b>GitHub Pages:</b> subir el contenido de dist a la rama gh-pages. El proyecto compila con '
+        'rutas relativas, así que también funciona en subcarpetas de usuario. <b>Pero no admite '
+        'cabeceras propias</b>: solo valen las declaradas en el HTML.',
         '<b>Dominio:</b> el negocio solo paga el dominio (por ejemplo .com.ar) y lo apunta al hosting. '
         'HTTPS queda incluido y es requisito para el portapapeles moderno (el botón Copiar tiene '
         'respaldo para contextos sin HTTPS).',
     ]))
+
+    historia.append(P('Qué hosting conviene (precios verificados al escribir este documento)', 'h2'))
+    historia.append(tabla(
+        ['', 'Plan gratis', 'Cabeceras propias', 'Uso comercial en el plan gratis', 'Plan pago más barato'],
+        [
+            ['Vercel', '100 GB/mes de tráfico', 'Sí (vercel.json)', 'NO: Hobby es “solo uso personal no comercial”; el comercial exige Pro', 'Pro: US$20/mes (por usuario, con US$20 de crédito)'],
+            ['Netlify', 'Tráfico y builds por créditos', 'Sí (public/_headers)', 'Sí', 'Pro: US$9/mes (1 miembro); US$20/mes con miembros ilimitados'],
+            ['Cloudflare Pages', '500 builds/mes, salida sin costo', 'Sí (public/_headers)', 'Sí', 'No hace falta para un sitio estático'],
+        ],
+        [2.5 * cm, 4.1 * cm, 2.9 * cm, 4.6 * cm, 2.9 * cm]))
+    historia.append(P(
+        '<b>Criterio para vender:</b> la demo puede vivir en Vercel (Hobby) mientras sea vidriera. '
+        'Cuando el local factura con el sitio, conviene <b>Netlify</b> o <b>Cloudflare Pages</b>, cuyo '
+        'plan gratis permite uso comercial y aplica las mismas cabeceras; si necesita más, Netlify Pro '
+        'cuesta la mitad que Vercel Pro.', 'chico'))
 
     historia.append(PageBreak())
 

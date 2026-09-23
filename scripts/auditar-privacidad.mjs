@@ -188,6 +188,26 @@ try {
     }
   }
 
+  /* ---- 5. cabeceras REALES del servidor (si es una URL publicada) ---- */
+  const esPublica = /^https?:\/\//.test(URL_BASE) && !/localhost|127\.0\.0\.1/.test(URL_BASE)
+  if (esPublica) {
+    const respuesta = await fetch(URL_BASE, { method: 'HEAD' }).catch(() => null)
+    const cabecera = (nombre) => (respuesta?.headers.get(nombre) || '').toLowerCase()
+    comprobar('la URL publicada responde', Boolean(respuesta?.ok), `HTTP ${respuesta?.status ?? 'sin respuesta'}`)
+    for (const [nombre, patron] of [
+      ['Content-Security-Policy', /default-src 'self'/],
+      ['X-Frame-Options', /deny/],
+      ['X-Content-Type-Options', /nosniff/],
+      ['Referrer-Policy', /no-referrer/],
+      ['Permissions-Policy', /camera=\(\)/],
+      ['Strict-Transport-Security', /max-age=\d{6,}/],
+    ]) {
+      comprobar(`el servidor envía ${nombre}`, patron.test(cabecera(nombre)), cabecera(nombre).slice(0, 60))
+    }
+  } else {
+    console.log('(auditoría local: las cabeceras del servidor se comprueban contra una URL publicada)')
+  }
+
   await writeFile('docs/privacidad-resultado.json', JSON.stringify(informe, null, 2) + '\n')
   console.log(`\n${fallos.length ? `${fallos.length} problema(s)` : 'Todo OK'} · informe en docs/privacidad-resultado.json`)
   process.exitCode = fallos.length ? 1 : 0
