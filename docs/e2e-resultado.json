@@ -1,6 +1,6 @@
 {
  "url": "http://localhost:4173/",
- "fecha": "2026-09-23T15:20:02.196Z",
+ "fecha": "2026-09-23T15:33:06.027Z",
  "checks": {
   "no guarda nada en el dispositivo (sin localStorage/cookies)": {
    "ok": true,
@@ -211,7 +211,7 @@
    "efectivo",
    "transferencia"
   ],
-  "mensaje": "*NUEVO PEDIDO — Valentin Jurado*\nPizzería — 23/09/2026 12:20\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
+  "mensaje": "*NUEVO PEDIDO — Valentin Jurado*\nPizzería — 23/09/2026 12:33\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
   "barraMovil": "4 | Ver mi pedido | $ 43.100,00"
  },
  "resumen": {

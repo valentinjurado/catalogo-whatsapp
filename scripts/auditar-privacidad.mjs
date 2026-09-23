@@ -24,15 +24,18 @@ const TELEFONO = '2494 123456'
 const NOMBRE = 'Valentin Jurado'
 
 // Hosts legítimos: el propio sitio, el Google Sheet y los hosts de las fotos.
-// (Se comparan sin puerto: new URL(...).hostname)
+// (Se comparan sin puerto: new URL(...).hostname; el host del sitio se agrega solo)
 const PERMITIDOS = [
-  'localhost',
-  '127.0.0.1',
   'docs.google.com',
   'drive.google.com',
   'lh3.googleusercontent.com',
   'images.unsplash.com',
 ]
+try {
+  PERMITIDOS.push(new URL(URL_BASE).hostname)
+} catch {
+  PERMITIDOS.push('localhost')
+}
 
 const informe = { url: URL_BASE, fecha: new Date().toISOString(), checks: {} }
 const fallos = []

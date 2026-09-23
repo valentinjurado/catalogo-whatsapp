@@ -1,6 +1,6 @@
 {
   "url": "http://localhost:4173/",
-  "fecha": "2026-09-23T15:22:24.612Z",
+  "fecha": "2026-09-23T15:34:14.802Z",
   "checks": {
     "el checkout llega al paso de forma de pago": {
       "ok": true,

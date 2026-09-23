@@ -1,5 +1,5 @@
 id,titulo,descripcion,ingredientes,precio,precio_oferta,categoria,url_imagen,stock,unidad,etiquetas,destacado,activo,orden
-PZ01,Pizza muzzarella,"La clásica, al molde.","Masa de pizza, salsa de tomate, muzzarella, aceitunas verdes, orégano.",9800,,Pizzas,https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=70,0,8 porciones,Más pedida,si,si,1
+PZ01,Pizza muzzarella,"La clásica, al molde.","Masa de pizza, salsa de tomate, muzzarella, aceitunas verdes, orégano.",9800,,Pizzas,https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=70,30,8 porciones,Más pedida,si,si,1
 PZ02,Pizza napolitana,"Con rodajas de tomate y ajo.","Masa de pizza, salsa de tomate, muzzarella, tomate en rodajas, ajo, orégano.",11500,,Pizzas,https://images.unsplash.com/photo-1548369937-47519962c11a?w=600&q=70,24,8 porciones,Vegetariano,si,si,2
 PZ03,Pizza especial,"Jamón, morrones y huevo.","Masa de pizza, salsa de tomate, muzzarella, jamón cocido, morrón, huevo, aceitunas.",13500,11900,Pizzas,https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&q=70,18,8 porciones,Promo,si,si,3
 PZ04,Pizza de pepperoni,"Con pepperoni picante.","Masa de pizza, salsa de tomate, muzzarella, pepperoni, orégano.",12900,,Pizzas,https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=600&q=70,16,8 porciones,Picante,no,si,4

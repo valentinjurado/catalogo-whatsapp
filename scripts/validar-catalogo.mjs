@@ -86,6 +86,17 @@ if (sospechosas.length) {
   sospechosas.forEach((p) => console.log(`  - ${p.titulo}: ${p.urlImagen}`))
 }
 
+// Un producto destacado sin stock es lo primero que ve el cliente: casi siempre
+// es un olvido de la planilla (y deja la primera tarjeta bloqueada).
+const destacadosSinStock = productos.filter((p) => p.destacado && p.sinStock)
+if (destacadosSinStock.length) {
+  console.log('\nOjo: hay productos DESTACADOS sin stock (aparecen primero y bloqueados):')
+  destacadosSinStock.forEach((p) => console.log(`  - ${p.titulo} (stock = 0)`))
+}
+if (sinStock.length) {
+  console.log(`\nProductos marcados como agotados: ${sinStock.map((p) => p.titulo).join(', ')}`)
+}
+
 const errores = sinPrecio.length + duplicados.length + sospechosas.length
 if (errores) {
   console.log(`\n✗ ${errores} problema(s) a corregir antes de publicar.`)
