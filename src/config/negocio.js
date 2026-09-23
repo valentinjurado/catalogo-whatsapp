@@ -11,7 +11,7 @@
 export const NEGOCIO = {
   // ---------- Identidad ----------
   marca: {
-    nombre: 'Pizzería Don Mateo',
+    nombre: 'Pizzería',
     eslogan: 'Pizzas al molde, empanadas y hamburguesas',
     descripcion:
       'Pizzas al molde, empanadas, hamburguesas y postres. Pedí online y confirmá por WhatsApp: envío a domicilio o retiro en el local.',
@@ -27,7 +27,7 @@ export const NEGOCIO = {
   whatsapp: {
     // ⚠️ PONÉ ACÁ TU NÚMERO PARA PROBAR: formato internacional SIN +, espacios
     //    ni guiones. Argentina: 54 9 <área> <número>  ->  '5492494123456'
-    numero: '5490000000000',
+    numero: '5492494684061',
     // Se usa en el saludo del mensaje de consulta
     nombreVendedor: 'Mateo',
   },
