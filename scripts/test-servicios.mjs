@@ -89,16 +89,20 @@ t('una oferta mayor al precio se descarta (no infla el total)', () => {
 console.log('\npedido.js')
 
 const items = [
-  { id: 'A1', titulo: 'Milanesa', precio: 8500, precioOferta: 7500, precioFinal: 7500, cantidad: 2, nota: 'sin cebolla' },
+  { id: 'A1', titulo: 'Milanesa', precio: 8500, precioOferta: 7500, precioFinal: 7500, cantidad: 3, nota: 'sin cebolla' },
   { id: 'A3', titulo: 'Coca-Cola', precio: 2900, precioOferta: null, precioFinal: 2900, cantidad: 1, nota: '' },
 ]
 
 t('calcula subtotal, unidades, envío y total', () => {
   const totales = calcularTotales(items, 'envio')
-  assert.equal(totales.subtotal, 7500 * 2 + 2900)
-  assert.equal(totales.unidades, 3)
-  assert.equal(totales.ahorro, 1000 * 2)
-  assert.equal(totales.envio, 0, `subtotal ${totales.subtotal} supera el umbral de envío gratis`)
+  assert.equal(totales.subtotal, 7500 * 3 + 2900)
+  assert.equal(totales.unidades, 4)
+  assert.equal(totales.ahorro, 1000 * 3)
+  assert.equal(
+    totales.envio,
+    0,
+    `el subtotal (${totales.subtotal}) supera el umbral de envío gratis (${NEGOCIO.entrega.envio.gratisDesde})`,
+  )
   assert.equal(totales.total, totales.subtotal)
 })
 
@@ -170,25 +174,44 @@ t('el mensaje incluye número de orden, detalle, totales, entrega y pago', () =>
   const mensaje = construirMensajePedido(pedido)
 
   assert.ok(mensaje.includes('*NUEVO PEDIDO PED-261004-7K3F*'))
-  assert.ok(mensaje.includes('• 2 x Milanesa (porción)'.replace(' (porción)', '')))
-  assert.ok(mensaje.includes('↳ Nota: sin cebolla'))
-  assert.ok(mensaje.includes('Modalidad: Envío a domicilio'))
+  assert.ok(mensaje.includes(`• ${items[0].cantidad} x Milanesa`))
+  assert.ok(mensaje.includes('↳ sin cebolla'))
+  assert.ok(mensaje.includes('Envío a domicilio'))
   assert.ok(mensaje.includes('Dirección: Rivadavia 1234, Tandil'))
-  assert.ok(mensaje.includes('Forma de pago: Transferencia bancaria'))
-  assert.ok(mensaje.includes('Alias: almacen.donarosa.mp'))
-  assert.ok(
-    mensaje.includes(NEGOCIO.pago.transferencia.confirmacion),
-    'debe incluir la frase exacta de confirmación de transferencia',
-  )
-  assert.ok(mensaje.includes('Nombre: Juan Pérez'))
+  assert.ok(mensaje.includes('*Pago*'))
+  assert.ok(mensaje.includes('Nombre: Juan Pérez'.replace('Nombre: ', '')))
   assert.ok(mensaje.includes('*TOTAL:'))
 })
 
-t('el mensaje de transferencia incluye la frase exigida por el flujo', () => {
-  assert.equal(
-    NEGOCIO.pago.transferencia.confirmacion,
-    'Ya realicé el pago al alias indicado, te adjunto el comprobante',
+t('la web no publica datos bancarios: el mensaje avisa que hay que pasar el alias', () => {
+  const pedido = construirPedido({
+    numeroOrden: 'PED-261004-TR01',
+    items,
+    entrega: 'retiro',
+    pago: 'transferencia',
+    datos: { nombre: 'Juan Pérez', telefono: '2494123456' },
+  })
+  const mensaje = construirMensajePedido(pedido)
+
+  assert.ok(
+    mensaje.includes('pasame el alias'),
+    'el mensaje debe pedirle el alias al local cuando el pago es por transferencia',
   )
+  assert.ok(!/\b(alias|CBU|CVU):\s*\S+/i.test(mensaje), 'no debe incluir datos bancarios')
+  assert.ok(!mensaje.includes('Ya realicé el pago'), 'ya no existe la frase de autoconfirmación de pago')
+})
+
+t('en efectivo el mensaje no habla de alias', () => {
+  const pedido = construirPedido({
+    numeroOrden: 'PED-261004-EF01',
+    items,
+    entrega: 'retiro',
+    pago: 'efectivo',
+    datos: { nombre: 'Juan Pérez', telefono: '2494123456' },
+  })
+  const mensaje = construirMensajePedido(pedido)
+  assert.ok(!mensaje.toLowerCase().includes('alias'))
+  assert.ok(/Efectivo/i.test(mensaje))
 })
 
 t('el link wa.me está bien formado y codificado', () => {
@@ -204,9 +227,10 @@ t('el link wa.me está bien formado y codificado', () => {
   assert.ok(!/[\s"]/.test(url), 'no debe quedar ningún espacio ni comilla sin codificar')
   const texto = decodeURIComponent(url.split('?text=')[1])
   assert.ok(texto.includes('PED-261004-AAAA'))
-  assert.ok(texto.includes('Modalidad: Retiro en el local'))
-  assert.ok(texto.includes('Forma de pago: Efectivo'))
-  assert.ok(!texto.includes('Alias:'), 'en efectivo no se manda el alias')
+  assert.ok(texto.includes('Retiro en el local'))
+  assert.ok(/Efectivo al recibir el pedido\./.test(texto))
+  assert.ok(!texto.toLowerCase().includes('alias'), 'en efectivo no se habla de alias')
+  assert.ok(!/CBU|CVU/i.test(texto))
 })
 
 t('formatea el total en pesos argentinos', () => {

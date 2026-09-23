@@ -2,173 +2,122 @@ import { useMemo, useState } from 'react'
 import Modal from '../ui/Modal'
 import PasoDatos from './PasoDatos'
 import PasoPago from './PasoPago'
-import PasoConfirmar from './PasoConfirmar'
 import PantallaExito from './PantallaExito'
 import { useCarrito } from '../../state/CarritoContext'
 import { useToast } from '../ui/Toast'
-import {
-  construirPedido,
-  generarNumeroOrden,
-  validarCheckout,
-} from '../../services/pedido'
+import { construirPedido, generarNumeroOrden, validarCheckout } from '../../services/pedido'
 import { urlPedidoWhatsapp } from '../../services/whatsapp'
-
-const PASOS = [
-  { numero: 1, titulo: 'Datos y entrega' },
-  { numero: 2, titulo: 'Forma de pago' },
-  { numero: 3, titulo: 'Confirmar' },
-]
+import { formatearPrecio } from '../../services/formato'
+import { IconoWhatsApp } from '../ui/Iconos'
 
 /**
- * <CheckoutModal> — embudo de venta en 3 pasos + pantalla de éxito.
+ * <CheckoutModal> — dos pantallas y a WhatsApp:
  *
- *   Paso 1  datos y entrega  → valida y avanza
- *   Paso 2  forma de pago    → efectivo o transferencia (datos para copiar)
- *   Paso 3  confirmar        → resumen + link wa.me con el mensaje codificado
- *   Éxito                    → número de orden, reabrir WhatsApp, copiar resumen
+ *   Paso 1  datos y entrega   → valida y avanza
+ *   Paso 2  forma de pago     → elige efectivo o transferencia
+ *   Éxito                     → número de orden y acceso para reabrir WhatsApp
  *
- * No se procesa ningún pago: sólo se arma el pedido y se abre WhatsApp.
- * Se monta únicamente mientras está abierto (ver App.jsx), así que el flujo
- * arranca limpio en cada apertura sin efectos de reinicio.
+ * El botón final es un enlace real a wa.me con el pedido ya escrito, así que
+ * funciona aunque el navegador bloquee ventanas emergentes. No se procesa ningún
+ * pago ni se publican datos bancarios.
+ *
+ * Se monta únicamente mientras está abierto (ver App.jsx): cada apertura arranca
+ * con un número de orden nuevo y el flujo limpio.
  */
 export default function CheckoutModal({ abierto, onCerrar }) {
   const carrito = useCarrito()
   const { avisar } = useToast()
   const [paso, setPaso] = useState(1)
   const [errores, setErrores] = useState({})
-  const [pedidoGuardado, setPedidoGuardado] = useState(null)
+  const [pedidoEnviado, setPedidoEnviado] = useState(null)
+  // Un número de orden por apertura del checkout
+  const [numeroOrden] = useState(() => generarNumeroOrden())
 
-  const { items, entrega, pago, datos, totales, numeroOrden } = carrito
+  const { items, entrega, pago, datos, totales } = carrito
 
-  const validarPaso1 = () => {
+  // El pedido se arma una sola vez al entrar al paso de pago
+  const pedido = useMemo(
+    () => (paso === 2 ? construirPedido({ numeroOrden, items, entrega, pago, datos }) : null),
+    [paso, numeroOrden, items, entrega, pago, datos],
+  )
+
+  const url = useMemo(() => (pedido ? urlPedidoWhatsapp(pedido) : '#'), [pedido])
+
+  const continuarAPago = () => {
     const { errores: encontrados } = validarCheckout({ items, entrega, pago, datos })
     const soloDatos = {}
     for (const clave of ['nombre', 'telefono', 'direccion', 'items']) {
       if (encontrados[clave]) soloDatos[clave] = encontrados[clave]
     }
     setErrores(soloDatos)
-    return Object.keys(soloDatos).length === 0
+    if (!Object.keys(soloDatos).length) setPaso(2)
   }
 
-  const irAPaso2 = () => {
-    if (validarPaso1()) setPaso(2)
-  }
-
-  // Borrador del pedido: se construye al entrar al paso 3 (una sola vez)
-  const pedido = useMemo(() => {
-    if (paso < 3) return null
-    return construirPedido({
-      numeroOrden: numeroOrden || generarNumeroOrden(),
-      items,
-      entrega,
-      pago,
-      datos,
-    })
-  }, [paso, numeroOrden, items, entrega, pago, datos])
-
-  const url = useMemo(() => (pedido ? urlPedidoWhatsapp(pedido) : '#'), [pedido])
-
-  const confirmarPedido = () => {
+  const enviarPedido = () => {
     if (!pedido) return
-    // Guardamos el número de orden para que el cliente lo tenga a mano
     carrito.setNumeroOrden(pedido.numeroOrden)
-    setPedidoGuardado(pedido)
-    setPaso(4)
-    avisar({
-      titulo: 'Pedido enviado a WhatsApp',
-      detalle: `${pedido.numeroOrden} · ${pedido.items.length} producto(s)`,
-      tono: 'ok',
-    })
+    setPedidoEnviado(pedido)
+    setPaso(3)
+    avisar({ titulo: 'Pedido enviado por WhatsApp', detalle: pedido.numeroOrden, tono: 'ok' })
   }
 
   const nuevoPedido = () => {
     carrito.vaciar()
-    setPedidoGuardado(null)
-    setPaso(1)
+    setPedidoEnviado(null)
     onCerrar?.()
   }
-
-  const titulo = paso === 4 ? 'Pedido enviado' : 'Finalizar pedido'
 
   return (
     <Modal
       abierto={abierto}
       onCerrar={onCerrar}
-      titulo={titulo}
-      descripcion={paso < 4 ? PASOS[paso - 1]?.titulo : undefined}
-      anchoMax={paso === 3 || paso === 4 ? 'max-w-xl' : 'max-w-2xl'}
+      titulo={paso === 3 ? 'Pedido enviado' : 'Finalizar pedido'}
+      descripcion={paso === 2 ? 'Forma de pago' : undefined}
+      anchoMax="max-w-xl"
       pie={
         paso === 1 ? (
           <div className="flex items-center justify-between gap-3">
             <span className="text-sm text-slate-600">
               Total{' '}
-              <strong className="tabular-nums text-slate-900">
-                {new Intl.NumberFormat('es-AR', {
-                  style: 'currency',
-                  currency: 'ARS',
-                }).format(totales.total)}
-              </strong>
+              <strong className="tabular-nums text-slate-900">{formatearPrecio(totales.total)}</strong>
             </span>
             <div className="flex gap-2">
               <button
                 onClick={onCerrar}
                 className="h-11 rounded-xl px-4 text-sm text-slate-600 transition hover:bg-slate-100"
               >
-                Seguir comprando
+                Seguir eligiendo
               </button>
-              <BotonSiguiente onClick={irAPaso2}>Elegir forma de pago</BotonSiguiente>
+              <button
+                onClick={continuarAPago}
+                className="inline-flex h-11 items-center justify-center rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700"
+              >
+                Continuar
+              </button>
             </div>
           </div>
         ) : paso === 2 ? (
-          <div className="flex items-center justify-between gap-3">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
             <button
               onClick={() => setPaso(1)}
               className="h-11 rounded-xl px-4 text-sm text-slate-600 transition hover:bg-slate-100"
             >
               Volver
             </button>
-            <BotonSiguiente onClick={() => setPaso(3)}>Revisar y confirmar</BotonSiguiente>
+            <a
+              href={url}
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={enviarPedido}
+              className="inline-flex h-12 flex-1 items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-6 text-base font-semibold text-white shadow-sm transition hover:bg-[#1eb355] active:bg-[#17914a] sm:flex-none"
+            >
+              <IconoWhatsApp className="w-5 h-5" />
+              Enviar pedido
+            </a>
           </div>
         ) : null
       }
     >
-      {/* Indicador de pasos */}
-      {paso < 4 && (
-        <ol className="mb-6 flex items-center gap-2">
-          {PASOS.map((p, i) => {
-            const activo = paso === p.numero
-            const hecho = paso > p.numero
-            return (
-              <li key={p.numero} className="flex flex-1 items-center gap-2">
-                <span
-                  className={[
-                    'grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-bold transition',
-                    hecho
-                      ? 'bg-brand-600 text-white'
-                      : activo
-                        ? 'bg-brand-600 text-white ring-4 ring-brand-100'
-                        : 'bg-slate-100 text-slate-500',
-                  ].join(' ')}
-                >
-                  {p.numero}
-                </span>
-                <span
-                  className={[
-                    'hidden text-xs font-medium sm:block',
-                    activo || hecho ? 'text-slate-800' : 'text-slate-400',
-                  ].join(' ')}
-                >
-                  {p.titulo}
-                </span>
-                {i < PASOS.length - 1 && (
-                  <span className="ml-auto hidden h-px flex-1 bg-slate-200 sm:block" />
-                )}
-              </li>
-            )
-          })}
-        </ol>
-      )}
-
       {paso === 1 && (
         <PasoDatos
           entrega={entrega}
@@ -179,43 +128,23 @@ export default function CheckoutModal({ abierto, onCerrar }) {
         />
       )}
 
-      {paso === 2 && (
+      {paso === 2 && pedido && (
         <PasoPago
           pago={pago}
           onPago={carrito.setPago}
-          total={totales.total}
+          total={totales.subtotal}
           entrega={entrega}
         />
       )}
 
-      {paso === 3 && pedido && (
-        <PasoConfirmar
-          pedido={pedido}
-          url={url}
-          onConfirmar={confirmarPedido}
-          onVolver={() => setPaso(2)}
-        />
-      )}
-
-      {paso === 4 && pedidoGuardado && (
+      {paso === 3 && pedidoEnviado && (
         <PantallaExito
-          pedido={pedidoGuardado}
-          url={urlPedidoWhatsapp(pedidoGuardado)}
+          pedido={pedidoEnviado}
+          url={urlPedidoWhatsapp(pedidoEnviado)}
           onNuevoPedido={nuevoPedido}
           onCerrar={onCerrar}
         />
       )}
     </Modal>
-  )
-}
-
-function BotonSiguiente({ children, onClick }) {
-  return (
-    <button
-      onClick={onClick}
-      className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-brand-600 px-5 text-sm font-semibold text-white shadow-sm transition hover:bg-brand-700 active:bg-brand-800"
-    >
-      {children}
-    </button>
   )
 }

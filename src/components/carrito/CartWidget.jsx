@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { createPortal } from 'react-dom'
 import { NEGOCIO } from '../../config/negocio'
 import { formatearPrecio } from '../../services/formato'
@@ -10,8 +10,11 @@ import { IconoCerrar, IconoFlecha, IconoMoto } from '../ui/Iconos'
 
 /**
  * <CartWidget> — carrito lateral (off-canvas).
- * Revisa productos, cantidades, entrega y totales. El pago y la confirmación
- * ocurren en <CheckoutModal> ("Continuar con el pedido").
+ * Revisa productos, cantidades, entrega y totales; el pago y el envío del
+ * pedido ocurren en <CheckoutModal>.
+ *
+ * El efecto del teclado depende solo de `abierto` (el handler va en un ref) para
+ * no re-ejecutarse en cada render del padre.
  */
 export default function CartWidget({
   abierto,
@@ -27,12 +30,17 @@ export default function CartWidget({
   onContinuar,
   onVaciar,
 }) {
+  const refCerrar = useRef(onCerrar)
+  useEffect(() => {
+    refCerrar.current = onCerrar
+  }, [onCerrar])
+
   useEffect(() => {
     if (!abierto) return
-    const alTeclear = (e) => e.key === 'Escape' && onCerrar?.()
+    const alTeclear = (e) => e.key === 'Escape' && refCerrar.current?.()
     document.addEventListener('keydown', alTeclear)
     return () => document.removeEventListener('keydown', alTeclear)
-  }, [abierto, onCerrar])
+  }, [abierto])
 
   if (!abierto) return null
 
@@ -67,9 +75,6 @@ export default function CartWidget({
               <IconoMoto className="w-6 h-6" />
             </span>
             <h3 className="mt-4 font-semibold text-slate-800">Todavía no agregaste nada</h3>
-            <p className="mt-1 text-sm text-slate-500">
-              Volvé al catálogo y tocá “Agregar al pedido”.
-            </p>
             <Boton variante="secundario" className="mt-5" onClick={onCerrar}>
               Ver el catálogo
             </Boton>
@@ -158,11 +163,8 @@ export default function CartWidget({
                 onClick={onContinuar}
                 iconoDer={<IconoFlecha className="w-4 h-4" />}
               >
-                Continuar con el pedido
+                Continuar
               </Boton>
-              <p className="mt-2.5 text-center text-[11px] text-slate-400">
-                No se cobra online. El pago se coordina con el local.
-              </p>
             </footer>
           </>
         )}

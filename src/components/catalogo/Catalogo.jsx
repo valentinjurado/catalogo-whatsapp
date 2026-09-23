@@ -6,7 +6,7 @@ import { ErrorCatalogo, GrillaSkeleton, SinResultados } from '../ui/Estados'
 import { IconoRefrescar } from '../ui/Iconos'
 
 /**
- * <Catalogo> — sección principal: filtros + grilla de productos.
+ * <Catalogo> — primera sección de la página: filtros + grilla de productos.
  * Recibe los datos ya resueltos (el fetch vive en useCatalogo) para que el
  * componente sea puro y fácil de testear.
  */
@@ -50,16 +50,9 @@ export default function Catalogo({
   }, [productos, busqueda, categoria, orden])
 
   return (
-    <section id="catalogo" className="mx-auto max-w-7xl px-4 sm:px-6 py-10 sm:py-14">
-      <div className="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
-            Catálogo
-          </h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Tocá “Agregar al pedido” y al final confirmás por WhatsApp.
-          </p>
-        </div>
+    <section id="menu" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-10">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <h1 className="text-2xl font-bold tracking-tight text-slate-900 sm:text-3xl">Menú</h1>
 
         {onRecargar && (
           <button
@@ -72,16 +65,16 @@ export default function Catalogo({
                     hour: '2-digit',
                     minute: '2-digit',
                   })}`
-                : 'Actualizar catálogo'
+                : 'Actualizar'
             }
           >
             <IconoRefrescar className={`w-4 h-4 ${refrescando ? 'animate-spin' : ''}`} />
-            {refrescando ? 'Actualizando…' : 'Actualizar precios'}
+            {refrescando ? 'Actualizando…' : 'Actualizar'}
           </button>
         )}
       </div>
 
-      <div className="mt-6">
+      <div className="mt-5">
         <Filtros
           categorias={categorias}
           categoria={categoria}
@@ -139,7 +132,7 @@ export default function Catalogo({
 
       {error && productos.length > 0 && (
         <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs text-amber-800">
-          Mostrando el catálogo guardado en tu teléfono: {error}
+          Mostrando el menú guardado en tu teléfono: {error}
         </p>
       )}
     </section>

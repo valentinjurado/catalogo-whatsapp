@@ -24,7 +24,7 @@ export default function Filtros({
             type="search"
             value={busqueda}
             onChange={(e) => onBusqueda(e.target.value)}
-            placeholder="Buscar en el catálogo…"
+            placeholder="Buscar en el menú…"
             aria-label="Buscar productos"
             className="h-12 w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-10 text-sm text-slate-900 placeholder:text-slate-400 transition focus:border-brand-400 focus:outline-none focus:ring-4 focus:ring-brand-50"
           />

@@ -5,8 +5,9 @@ import { fechaLegible, formatearPrecio, limpiarTelefono } from './formato.js'
  * ============================================================================
  *  GENERADOR DE MENSAJE / LINK DE WHATSAPP
  * ============================================================================
- *  La web NO cobra: arma un texto estructurado y abre WhatsApp con ese texto
- *  ya escrito. El vendedor lo recibe como un pedido listo para preparar.
+ *  La web NO cobra y NO publica datos bancarios: arma un texto estructurado y
+ *  abre WhatsApp con ese texto ya escrito. Si el cliente elige transferencia,
+ *  el propio mensaje le avisa al local que tiene que pasar el alias.
  *
  *  Formato: *negrita* es el marcado nativo de WhatsApp.
  */
@@ -21,16 +22,16 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
   L.push('')
 
   // ---- Detalle ----
-  L.push('*Detalle del pedido*')
+  L.push('*Detalle*')
   pedido.items.forEach((item) => {
     const unidad = item.unidad ? ` (${item.unidad})` : ''
     L.push(`• ${item.cantidad} x ${item.titulo}${unidad} — ${formatearPrecio(item.subtotalLinea)}`)
-    if (item.nota) L.push(`   ↳ Nota: ${item.nota}`)
+    if (item.nota) L.push(`   ↳ ${item.nota}`)
   })
   L.push('')
 
   // ---- Totales ----
-  L.push(`Subtotal (${pedido.unidades} ${pedido.unidades === 1 ? 'ítem' : 'ítems'}): ${formatearPrecio(pedido.subtotal)}`)
+  L.push(`Subtotal: ${formatearPrecio(pedido.subtotal)}`)
   if (pedido.entrega === 'envio') {
     L.push(
       pedido.envio > 0
@@ -44,35 +45,27 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
 
   // ---- Entrega ----
   L.push('*Entrega*')
-  L.push(`Modalidad: ${pedido.entregaTexto}`)
+  L.push(`${pedido.entregaTexto}`)
   if (pedido.entrega === 'retiro') {
     L.push(`Retiro en: ${negocio.entrega.retiro.direccion}`)
   } else if (cliente.direccion) {
     L.push(`Dirección: ${cliente.direccion}`)
     if (cliente.referencia) L.push(`Referencia: ${cliente.referencia}`)
   }
-  if (cliente.horario) L.push(`Horario preferido: ${cliente.horario}`)
+  if (cliente.horario) L.push(`Horario: ${cliente.horario}`)
   L.push('')
 
-  // ---- Pago (sin pasarela: se coordina por fuera) ----
+  // ---- Pago (se coordina por fuera de la web) ----
+  const pago = pedido.pago === 'transferencia' ? negocio.pago.transferencia : negocio.pago.efectivo
   L.push('*Pago*')
-  L.push(`Forma de pago: ${pedido.pagoTexto}`)
-  if (pedido.pago === 'transferencia') {
-    const t = negocio.pago.transferencia
-    L.push(`Alias: ${t.alias}`)
-    L.push(t.confirmacion + '.')
-  } else {
-    L.push(negocio.pago.efectivo.detalle)
-  }
+  L.push(pago.lineaMensaje)
   L.push('')
 
   // ---- Cliente ----
   L.push('*Cliente*')
-  L.push(`Nombre: ${cliente.nombre}`)
+  L.push(`${cliente.nombre}`)
   if (cliente.telefono) L.push(`Teléfono: ${cliente.telefono}`)
   if (cliente.aclaraciones) L.push(`Aclaraciones: ${cliente.aclaraciones}`)
-  L.push('')
-  L.push('_Pedido generado automáticamente desde la web del catálogo._')
 
   return L.join('\n')
 }
@@ -80,9 +73,7 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
 /** Link listo para abrir WhatsApp: https://wa.me/<numero>?text=<mensaje codificado> */
 export function construirUrlWhatsapp(mensaje, numero = NEGOCIO.whatsapp.numero) {
   const destino = limpiarTelefono(numero)
-  const codificado = encodeURIComponent(mensaje)
-  // wa.me funciona en app y web; ?type=phone_number evita el cartel de "número desconocido"
-  return `https://wa.me/${destino}?text=${codificado}`
+  return `https://wa.me/${destino}?text=${encodeURIComponent(mensaje)}`
 }
 
 /** Atajo: pedido completo → URL de WhatsApp */
@@ -90,15 +81,14 @@ export function urlPedidoWhatsapp(pedido, negocio = NEGOCIO) {
   return construirUrlWhatsapp(construirMensajePedido(pedido, negocio), negocio.whatsapp.numero)
 }
 
-/** Consulta rápida (botón flotante "¿Tenés dudas?") */
-export function urlConsulta(mensaje = `¡Hola ${NEGOCIO.whatsapp.nombreVendedor}! Quería hacer una consulta sobre el catálogo.`) {
+/** Consulta rápida (botón de WhatsApp del encabezado y del pie) */
+export function urlConsulta(
+  mensaje = `¡Hola ${NEGOCIO.whatsapp.nombreVendedor}! Quería hacer una consulta.`,
+) {
   return construirUrlWhatsapp(mensaje)
 }
 
-/**
- * Copia de respaldo del pedido en texto simple (para pegar en un correo o
- * guardar como comprobante del armado). Sin marcado de WhatsApp.
- */
+/** Copia del pedido sin marcado de WhatsApp (para guardar o pegar en otro lado). */
 export function pedidoComoTextoPlano(pedido, negocio = NEGOCIO) {
   return construirMensajePedido(pedido, negocio).replace(/\*/g, '').replace(/_/g, '')
 }

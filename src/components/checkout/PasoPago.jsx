@@ -1,41 +1,28 @@
 import { NEGOCIO } from '../../config/negocio'
 import { formatearPrecio } from '../../services/formato'
-import DatosTransferencia from './DatosTransferencia'
 import { IconoCheck, IconoEfectivo, IconoTransferencia } from '../ui/Iconos'
 
 /**
  * Paso 2 — forma de pago.
- * IMPORTANTE: no existe cobro online. Esta pantalla sólo informa cómo pagar
- * por fuera de la web (efectivo al recibir o transferencia bancaria).
+ * No hay cobro online ni datos bancarios en la web: el cliente sólo elige cómo
+ * va a pagar y el local se entera por el mensaje de WhatsApp (si es
+ * transferencia, desde el chat le pasa el alias).
  */
-export default function PasoPago({ pago, onPago, total }) {
+export default function PasoPago({ pago, onPago, total, entrega }) {
   const opciones = [
     NEGOCIO.pago.efectivo.habilitado && {
       clave: 'efectivo',
       icono: <IconoEfectivo className="w-5 h-5" />,
       titulo: 'Efectivo',
       detalle: NEGOCIO.pago.efectivo.detalle,
-      nota: 'Se abona cuando recibís el pedido.',
     },
     NEGOCIO.pago.transferencia.habilitado && {
       clave: 'transferencia',
       icono: <IconoTransferencia className="w-5 h-5" />,
-      titulo: 'Transferencia bancaria',
-      detalle: `Alias ${NEGOCIO.pago.transferencia.alias}`,
-      nota: 'Transferís desde tu banco y adjuntás el comprobante por WhatsApp.',
+      titulo: 'Transferencia',
+      detalle: NEGOCIO.pago.transferencia.detalle,
     },
   ].filter(Boolean)
-
-  if (opciones.length === 1) {
-    return (
-      <div className="space-y-4">
-        <p className="text-sm text-slate-500">
-          Este local trabaja únicamente con <strong>{opciones[0].titulo}</strong>.
-        </p>
-        {opciones[0].clave === 'transferencia' && <DatosTransferencia total={total} />}
-      </div>
-    )
-  }
 
   return (
     <div className="space-y-5">
@@ -80,7 +67,6 @@ export default function PasoPago({ pago, onPago, total }) {
                     )}
                   </span>
                   <span className="mt-0.5 block text-sm text-slate-600">{o.detalle}</span>
-                  <span className="mt-0.5 block text-xs text-slate-400">{o.nota}</span>
                 </span>
               </label>
             )
@@ -88,17 +74,16 @@ export default function PasoPago({ pago, onPago, total }) {
         </div>
       </fieldset>
 
-      {pago === 'efectivo' ? (
-        <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 text-sm text-slate-600">
-          <p className="font-medium text-slate-800">Pago en efectivo al recibir</p>
-          <p className="mt-1">
-            Total a abonar: <strong className="text-slate-900">{formatearPrecio(total)}</strong>. Si
-            necesitás vuelto, avisanos en las aclaraciones del pedido.
-          </p>
+      <dl className="space-y-1.5 rounded-2xl bg-slate-50 p-4 text-sm">
+        <div className="flex justify-between text-slate-600">
+          <dt>Productos</dt>
+          <dd className="tabular-nums">{formatearPrecio(total)}</dd>
         </div>
-      ) : (
-        <DatosTransferencia total={total} />
-      )}
+        <div className="flex justify-between text-slate-600">
+          <dt>{entrega === 'envio' ? 'Envío' : 'Retiro en el local'}</dt>
+          <dd>{entrega === 'envio' ? 'Según la dirección indicada' : NEGOCIO.entrega.retiro.direccion}</dd>
+        </div>
+      </dl>
     </div>
   )
 }

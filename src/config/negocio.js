@@ -2,23 +2,21 @@
  * ============================================================
  *  CONFIGURACIÓN DEL NEGOCIO  (único archivo a editar)
  * ============================================================
- * Todo lo que cambia entre un local y otro vive acá.
- * Este archivo es la "instalación" de la plantilla: se edita,
- * no se toca el resto del código.
+ * Todo lo que cambia entre un local y otro vive acá: marca, colores, número de
+ * WhatsApp, envío, formas de pago y textos. No hace falta tocar componentes.
  *
- * ⚠️ NUNCA pongas datos sensibles (claves, tokens, tarjetas) acá:
- *    todo lo que está en este archivo termina visible en el navegador.
- *    Alias/CBU son datos públicos de cobro, por eso sí van.
+ * ⚠️ NUNCA pongas datos sensibles (claves, tokens, tarjetas) en este archivo:
+ *    todo lo que está acá termina visible en el navegador.
  */
 export const NEGOCIO = {
   // ---------- Identidad ----------
   marca: {
-    nombre: 'Almacén Doña Rosa',
-    eslogan: 'Almacén, rotisería y bebidas a domicilio',
+    nombre: 'Pizzería Don Mateo',
+    eslogan: 'Pizzas al molde, empanadas y hamburguesas',
     descripcion:
-      'Hacé tu pedido desde el celular y lo confirmamos por WhatsApp. Envío a domicilio o retiro en el local.',
+      'Pizzas al molde, empanadas, hamburguesas y postres. Pedí online y confirmá por WhatsApp: envío a domicilio o retiro en el local.',
     // Tema visual: verde | azul | bordo | naranja | violeta | grafito
-    tema: 'verde',
+    tema: 'naranja',
     // Redondeo de tarjetas en píxeles (16 = suave, 4 = recto)
     radio: 16,
     // URL opcional del logo (si está vacío se muestra la inicial del negocio)
@@ -27,15 +25,14 @@ export const NEGOCIO = {
 
   // ---------- WhatsApp del vendedor ----------
   whatsapp: {
-    // Formato internacional SIN +, espacios ni guiones. Argentina: 54 9 <área> <número>
-    numero: '5492494123456',
-    // Se usa en el encabezado del mensaje ("Hola Rosa!")
-    nombreVendedor: 'Rosa',
-    // Abrir WhatsApp en la app o en la web
-    soloWeb: false,
+    // ⚠️ PONÉ ACÁ TU NÚMERO PARA PROBAR: formato internacional SIN +, espacios
+    //    ni guiones. Argentina: 54 9 <área> <número>  ->  '5492494123456'
+    numero: '5490000000000',
+    // Se usa en el saludo del mensaje de consulta
+    nombreVendedor: 'Mateo',
   },
 
-  // ---------- Origen de datos (Google Sheets) ----------
+  // ---------- Origen de datos (Google Sheets = panel de administración) ----------
   catalogo: {
     // OPCIÓN A (recomendada): Archivo > Compartir > Publicar en la web > CSV
     hojaCsv: '',
@@ -52,57 +49,47 @@ export const NEGOCIO = {
   entrega: {
     envio: {
       habilitado: true,
-      costo: 900,
+      costo: 1200,
       // Envío gratis desde este monto (0 = sin promoción)
-      gratisDesde: 15000,
-      zonas: 'Tandil y alrededores (hasta 8 km)',
-      demora: '45 a 60 minutos',
-      // true = la dirección es obligatoria para envío
+      gratisDesde: 20000,
+      zonas: 'Tandil centro y alrededores (hasta 6 km)',
+      demora: '35 a 50 minutos',
       requiereDireccion: true,
     },
     retiro: {
       habilitado: true,
-      direccion: 'Rivadavia 1234, Tandil',
-      horarios: 'Lun a Sáb de 9 a 13 y de 17 a 21 hs',
+      direccion: 'Av. Colón 1234, Tandil',
+      horarios: 'Martes a domingo de 19 a 24 hs',
       demora: 'Listo en 20 minutos',
     },
-    // Permitir que el cliente elija hora/franja en el paso de datos
     pedirHorario: true,
-    // Permitir aclaraciones por producto (sin cebolla, sin sal, etc.)
     permitirNotasProducto: true,
   },
 
   // ---------- Formas de pago (NO hay cobro online) ----------
+  // El local no publica datos bancarios: si el cliente paga por transferencia,
+  // el alias se comparte por el chat de WhatsApp.
   pago: {
     efectivo: {
       habilitado: true,
-      detalle: 'Abonás al recibir el pedido. Avisá si necesitás vuelto.',
+      detalle: 'Abonás al recibir el pedido.',
+      // Cómo aparece en el mensaje que recibe el local
+      lineaMensaje: 'Efectivo al recibir el pedido.',
     },
     transferencia: {
       habilitado: true,
-      titular: 'Rosa Gutiérrez',
-      banco: 'Banco Provincia',
-      alias: 'almacen.donarosa.mp',
-      cbu: '0140011500150012345678',
-      cuit: '27-12345678-4',
-      // Texto que se muestra en pantalla y se incluye en el mensaje
-      aviso:
-        'Transferí el total desde tu home banking y dejá el comprobante a mano: lo adjuntás en el chat.',
-      // Texto EXACTO que exige el flujo de pedido para el caso transferencia
-      confirmacion: 'Ya realicé el pago al alias indicado, te adjunto el comprobante',
+      detalle: 'Te compartimos el alias por WhatsApp para que puedas transferir.',
+      // Línea que se agrega al mensaje: le avisa al local que debe pasar el alias
+      lineaMensaje: 'Transferencia: pasame el alias para transferir.',
     },
   },
 
   // ---------- Reglas del pedido ----------
   pedido: {
-    // Monto mínimo del pedido (0 = sin mínimo)
     minimo: 0,
-    // Prefijo del número de orden
     prefijoOrden: 'PED',
-    // Moneda y formato
     moneda: 'ARS',
     locale: 'es-AR',
-    // Campos del cliente que se piden en el checkout
     campos: {
       nombre: true,
       telefono: true,
@@ -112,17 +99,9 @@ export const NEGOCIO = {
     },
   },
 
-  // ---------- Textos de la interfaz (multiidioma / tono) ----------
+  // ---------- Textos ----------
   textos: {
-    heroBadge: 'Pedidos por WhatsApp',
-    heroTitulo: 'Tu pedido, listo en 3 pasos',
-    heroSubtitulo:
-      'Elegí los productos, decinos cómo lo querés y confirmá por WhatsApp. Sin registros y sin pagar online.',
-    ctaWhatsapp: 'Confirmar pedido por WhatsApp',
-    avisoSinTarjetas:
-      'No pedimos datos de tarjetas. El pago se coordina con el local por fuera de la web.',
-    pieLegal:
-      'Los precios pueden variar sin aviso. Las imágenes son ilustrativas.',
+    pieLegal: 'Los precios pueden variar sin aviso. Las imágenes son ilustrativas.',
   },
 }
 

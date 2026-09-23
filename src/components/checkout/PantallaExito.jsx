@@ -1,13 +1,10 @@
-import { NEGOCIO } from '../../config/negocio'
 import { formatearPrecio } from '../../services/formato'
 import { pedidoComoTextoPlano } from '../../services/whatsapp'
 import { useCopiar } from '../../hooks/useCopiar'
 import Boton from '../ui/Boton'
 import { IconoCheck, IconoCopiar, IconoWhatsApp } from '../ui/Iconos'
 
-/**
- * Pantalla de cierre: número de orden + accesos por si el mensaje no se envió.
- */
+/** Cierre: número de orden y accesos por si el mensaje no se envió. */
 export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) {
   const [copiar, copiado] = useCopiar()
 
@@ -18,27 +15,17 @@ export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) 
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-slate-900">¡Pedido enviado!</h3>
-        <p className="mx-auto mt-1 max-w-sm text-sm text-slate-600">
-          Se abrió WhatsApp con tu pedido escrito. Tocá enviar y {NEGOCIO.whatsapp.nombreVendedor} te
-          confirma el total y la {pedido.entrega === 'envio' ? 'entrega' : 'disponibilidad'}.
-        </p>
+        <h3 className="text-lg font-semibold text-slate-900">¡Listo!</h3>
+        <p className="mt-1 text-sm text-slate-600">Se abrió WhatsApp con tu pedido.</p>
       </div>
 
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4">
-        <p className="text-xs uppercase tracking-wide text-slate-500">Tu número de orden</p>
+        <p className="text-xs uppercase tracking-wide text-slate-500">Número de pedido</p>
         <p className="mt-1 font-mono text-xl font-bold text-slate-900">{pedido.numeroOrden}</p>
         <p className="mt-1 text-xs text-slate-500">
           Total {formatearPrecio(pedido.total)} · {pedido.pagoTexto}
         </p>
       </div>
-
-      {pedido.pago === 'transferencia' && (
-        <p className="rounded-2xl border border-amber-200 bg-amber-50/70 p-3.5 text-sm text-amber-900">
-          Recordá transferir al alias <strong>{NEGOCIO.pago.transferencia.alias}</strong> y adjuntar
-          el comprobante en el chat.
-        </p>
-      )}
 
       <div className="grid gap-2 sm:grid-cols-2">
         <a
@@ -48,7 +35,7 @@ export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) 
           className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-[#25D366] px-5 text-sm font-semibold text-white transition hover:bg-[#1eb355]"
         >
           <IconoWhatsApp className="w-4 h-4" />
-          Abrir WhatsApp otra vez
+          Abrir WhatsApp
         </a>
         <Boton
           variante="secundario"
@@ -58,7 +45,7 @@ export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) 
             copiado === 'pedido' ? <IconoCheck className="w-4 h-4" /> : <IconoCopiar className="w-4 h-4" />
           }
         >
-          {copiado === 'pedido' ? 'Resumen copiado' : 'Copiar resumen'}
+          {copiado === 'pedido' ? 'Copiado' : 'Copiar pedido'}
         </Boton>
       </div>
 
@@ -70,7 +57,7 @@ export default function PantallaExito({ pedido, url, onNuevoPedido, onCerrar }) 
           Hacer otro pedido
         </button>
         <button onClick={onCerrar} className="text-xs text-slate-400 hover:text-slate-600">
-          Seguir mirando el catálogo
+          Seguir mirando el menú
         </button>
       </div>
     </div>

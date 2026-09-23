@@ -1,18 +1,22 @@
 {
- "url": "https://valentinjurado.github.io/catalogo-whatsapp/",
- "fecha": "2026-09-23T02:55:48.338Z",
+ "url": "http://localhost:4173/",
+ "fecha": "2026-09-23T03:27:10.939Z",
  "checks": {
   "carrito arranca vacío": {
    "ok": true,
    "detalle": ""
   },
-  "catálogo renderiza productos": {
-   "ok": true,
-   "detalle": "20 tarjetas"
-  },
-  "modo demostración avisado": {
+  "el menú se renderiza primero": {
    "ok": true,
    "detalle": ""
+  },
+  "los productos aparecen sin hero de por medio": {
+   "ok": true,
+   "detalle": ""
+  },
+  "renderiza productos": {
+   "ok": true,
+   "detalle": "21 tarjetas"
   },
   "producto agotado bloqueado": {
    "ok": true,
@@ -22,17 +26,21 @@
    "ok": true,
    "detalle": ""
   },
+  "sin textos técnicos en la página": {
+   "ok": true,
+   "detalle": ""
+  },
   "imágenes de producto cargadas": {
    "ok": true,
-   "detalle": "20/20"
+   "detalle": "21/21"
   },
   "el buscador filtra": {
    "ok": true,
-   "detalle": "1 resultados"
+   "detalle": "8 resultados"
   },
   "el filtro por categoría funciona": {
    "ok": true,
-   "detalle": "3 en Panadería"
+   "detalle": "4 en Hamburguesas"
   },
   "agrega productos al carrito": {
    "ok": true,
@@ -48,17 +56,25 @@
   },
   "calcula totales": {
    "ok": true,
-   "detalle": "Subtotal | $ 17.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 2.000,00 | Total | $ 17.200,00"
+   "detalle": "Subtotal | $ 33.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 1.600,00 | Total | $ 33.200,00"
   },
   "abre el checkout en el paso de datos": {
    "ok": true,
    "detalle": ""
   },
-  "bloquea el avance sin datos": {
+  "el campo conserva el foco mientras se escribe": {
    "ok": true,
-   "detalle": "3 errores marcados"
+   "detalle": "campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido → campo-nombre-y-apellido"
   },
-  "avanza al paso de pago": {
+  "el texto escrito llega completo al campo": {
+   "ok": true,
+   "detalle": "\"Valentin\""
+  },
+  "bloquea el avance con datos incompletos": {
+   "ok": true,
+   "detalle": "1 errores marcados"
+  },
+  "avanza a la elección de forma de pago": {
    "ok": true,
    "detalle": ""
   },
@@ -66,33 +82,29 @@
    "ok": true,
    "detalle": ""
   },
+  "no hay ningún paso de \"confirmar pedido\" aparte": {
+   "ok": true,
+   "detalle": ""
+  },
+  "no muestra CBU/CVU en pantalla": {
+   "ok": true,
+   "detalle": ""
+  },
+  "no muestra ningún alias con valor": {
+   "ok": true,
+   "detalle": ""
+  },
   "no pide datos de tarjeta": {
    "ok": true,
    "detalle": ""
   },
-  "muestra el alias para transferir": {
-   "ok": true,
-   "detalle": ""
-  },
-  "muestra el CBU": {
-   "ok": true,
-   "detalle": ""
-  },
-  "permite copiar los datos bancarios": {
-   "ok": true,
-   "detalle": "3 botones Copiar"
-  },
-  "pide adjuntar el comprobante": {
-   "ok": true,
-   "detalle": ""
-  },
-  "llega al paso de confirmación": {
+  "la transferencia explica que el alias llega por WhatsApp": {
    "ok": true,
    "detalle": ""
   },
   "el enlace apunta a wa.me con el número configurado": {
    "ok": true,
-   "detalle": "https://wa.me/5492494123456"
+   "detalle": "https://wa.me/5490000000000"
   },
   "la URL no tiene espacios ni comillas sin codificar": {
    "ok": true,
@@ -100,7 +112,7 @@
   },
   "el mensaje lleva el número de orden": {
    "ok": true,
-   "detalle": "PED-260922-FPNK"
+   "detalle": ""
   },
   "el mensaje lleva el detalle con subtotales": {
    "ok": true,
@@ -114,11 +126,11 @@
    "ok": true,
    "detalle": ""
   },
-  "el mensaje lleva la forma de pago": {
+  "el mensaje avisa que hay que pasar el alias (transferencia)": {
    "ok": true,
    "detalle": ""
   },
-  "el mensaje incluye la frase de transferencia exigida": {
+  "el mensaje NO incluye datos bancarios": {
    "ok": true,
    "detalle": ""
   },
@@ -144,25 +156,34 @@
   }
  },
  "datos": {
-  "tarjetas": 20,
-  "imagenes": "20/20",
-  "busqueda": 1,
-  "porCategoria": 3,
-  "totalesCarrito": "Subtotal | $ 17.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 2.000,00 | Total | $ 17.200,00",
-  "erroresValidacion": 3,
+  "tarjetas": 21,
+  "imagenes": "21/21",
+  "busqueda": 8,
+  "porCategoria": 4,
+  "totalesCarrito": "Subtotal | $ 33.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 1.600,00 | Total | $ 33.200,00",
+  "focoPorTecla": [
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido",
+   "campo-nombre-y-apellido"
+  ],
+  "erroresValidacion": 1,
   "formasDePago": [
    "efectivo",
    "transferencia"
   ],
-  "botonesCopiar": 3,
-  "numeroOrden": "PED-260922-FPNK",
-  "mensaje": "*NUEVO PEDIDO PED-260922-FPNK*\nAlmacén Doña Rosa — 22/09/2026 23:56\n\n*Detalle del pedido*\n• 1 x Milanesa napolitana con guarnición (porción) — $ 8.500,00\n• 1 x Empanadas de carne cortada a cuchillo (media docena) — $ 6.500,00\n• 1 x Pan casero de campo (horma) — $ 2.200,00\n\nSubtotal (3 ítems): $ 17.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 2.000,00\n*TOTAL: $ 17.200,00*\n\n*Entrega*\nModalidad: Envío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nForma de pago: Transferencia bancaria\nAlias: almacen.donarosa.mp\nYa realicé el pago al alias indicado, te adjunto el comprobante.\n\n*Cliente*\nNombre: Valentin Jurado\nTeléfono: 2494 123456\n\n_Pedido generado automáticamente desde la web del catálogo._",
-  "ordenGuardada": "PED-260922-FPNK",
-  "barraMovil": "3 | Ver mi pedido | $ 17.200,00"
+  "numeroOrden": null,
+  "mensaje": "*NUEVO PEDIDO PED-260923-URWG*\nPizzería Don Mateo — 23/09/2026 00:27\n\n*Detalle*\n• 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n\nSubtotal: $ 33.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 1.600,00\n*TOTAL: $ 33.200,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
+  "ordenGuardada": "PED-260923-URWG",
+  "barraMovil": "3 | Ver mi pedido | $ 33.200,00"
  },
  "resumen": {
-  "total": 35,
-  "ok": 35,
+  "total": 38,
+  "ok": 38,
   "fallos": []
  }
 }

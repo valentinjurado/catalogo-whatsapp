@@ -1,7 +1,6 @@
 import { NEGOCIO } from '../../config/negocio'
 import Campo from '../ui/Campo'
 import SelectorEntrega from '../carrito/SelectorEntrega'
-import { IconoEscudo } from '../ui/Iconos'
 
 /**
  * Paso 1 — datos de contacto y entrega.
@@ -111,12 +110,6 @@ export default function PasoDatos({ entrega, datos, errores, onEntrega, onDatos 
           </Campo>
         </div>
       </div>
-
-      <p className="flex items-start gap-2.5 rounded-2xl bg-slate-50 p-3.5 text-xs text-slate-500">
-        <IconoEscudo className="mt-0.5 h-4 w-4 shrink-0 text-brand-600" />
-        Usamos tus datos sólo para coordinar la entrega por WhatsApp. No hay cobros ni datos de
-        tarjetas en este sitio.
-      </p>
     </div>
   )
 }

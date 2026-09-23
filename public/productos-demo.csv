@@ -1,21 +1,22 @@
 id,titulo,descripcion,precio,precio_oferta,categoria,url_imagen,stock,unidad,etiquetas,destacado,activo,orden
-MIL01,Milanesa napolitana con guarnición,"Carne de ternera, salsa de tomate, muzzarella y jamón. Incluye papas fritas o puré.",9800,8500,Rotisería,https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&q=70,12,porción,Popular,si,si,1
-POL02,Pollo al spiedo,"Pollo entero cocido a leña con papas rústicas.",11500,,Rotisería,https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=600&q=70,6,unidad,,no,si,2
-EMP03,Empanadas de carne cortada a cuchillo,"Media docena de empanadas de carne con masa casera.",7200,6500,Rotisería,https://images.unsplash.com/photo-1600891964092-4316c288032e?w=600&q=70,20,media docena,Oferta,si,si,3
-SOR04,Sorrentinos de ricota y jamón,"Pasta rellena artesanal. Se entregan frescos.",6400,,Rotisería,https://images.unsplash.com/photo-1625772299848-391b6a87d7b3?w=600&q=70,14,500 g,Casero,no,si,4
-TAR05,Tarta de jamón y queso,"Tarta grande recién horneada.",5900,,Rotisería,https://images.unsplash.com/photo-1513104890138-7c749659a591?w=600&q=70,8,unidad,,no,si,5
-PAN06,Pan casero de campo,"Horma de pan de masa madre.",2200,,Panadería,https://images.unsplash.com/photo-1509440159596-0249088772ff?w=600&q=70,25,horma,Recién hecho,si,si,6
-FAC07,Facturas surtidas,"Docena de facturas con membrillo, crema y dulce de leche.",4800,4200,Panadería,https://images.unsplash.com/photo-1550989460-0adf9ea622e2?w=600&q=70,18,docena,Oferta,no,si,7
-MED08,Medialunas de manteca,"Docena de medialunas de manteca.",5200,,Panadería,https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?w=600&q=70,15,docena,,no,si,8
-HUE09,Huevos de campo,"Docena de huevos frescos de gallinas libres.",4300,,Almacén,https://images.unsplash.com/photo-1582722872445-44dc5f7e3c8f?w=600&q=70,30,docena,,no,si,9
-QUE10,Queso cremoso en horma,"Cortado en el momento. Ideal para picadas.",8900,,Almacén,https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=600&q=70,10,1 kg,,no,si,10
-YER11,Yerba mate despalada,"Yerba tradicional de molienda media.",5400,4900,Almacén,https://images.unsplash.com/photo-1584225064785-c62a8b43d148?w=600&q=70,22,1 kg,Oferta,no,si,11
-ACE12,Aceite de girasol,"Girasol alto oleico.",3800,,Almacén,https://images.unsplash.com/photo-1563636619-e9143da7973b?w=600&q=70,35,"1,5 l",,no,si,12
-COC13,"Coca-Cola 1,5 L","Bebida gaseosa bien fría.",3500,2900,Bebidas,https://images.unsplash.com/photo-1552332386-f8dd00dc2f85?w=600&q=70,40,"1,5 l",Oferta,si,si,13
-CER14,Cerveza artesanal IPA,"Lata de 473 ml de cervecería local.",4200,,Bebidas,https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=70,24,473 ml,Artesanal,no,si,14
-VIN15,Vino Malbec reserva,"750 ml. Apto para carnes rojas.",7600,,Bebidas,https://images.unsplash.com/photo-1510812431401-41d2bd2722f3?w=600&q=70,12,750 ml,,no,si,15
-AGU16,Agua mineral sin gas,"Pack de 6 botellas de 2 L.",6500,5900,Bebidas,https://images.unsplash.com/photo-1610832958506-aa56368176cf?w=600&q=70,20,pack x6,Oferta,no,si,16
-TOM17,Tomate perita,"Verdulería de estación.",2400,,Verdulería,https://images.unsplash.com/photo-1592924357228-91a4daadcfea?w=600&q=70,18,1 kg,,no,si,17
-PAP18,Papa negra,"Lavada y clasificada.",1900,,Verdulería,https://images.unsplash.com/photo-1518977676601-b53f82aba655?w=600&q=70,40,1 kg,,no,si,18
-LEC19,Lechuga mantecosa,"De producción local.",1200,,Verdulería,https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=600&q=70,0,unidad,Agotado,no,si,19
-LIM20,Limón,"Semilla y jugoso.",2800,,Verdulería,https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=70,25,1 kg,,no,si,20
+PZ01,Pizza muzzarella al molde,"Masa al molde, muzzarella y aceitunas verdes.",9800,,Pizzas,https://images.unsplash.com/photo-1574071318508-1cdbab80d002?w=600&q=70,30,8 porciones,Más pedida,si,si,1
+PZ02,Pizza napolitana,"Muzzarella, rodajas de tomate y ajo.",11500,,Pizzas,https://images.unsplash.com/photo-1548369937-47519962c11a?w=600&q=70,24,8 porciones,,si,si,2
+PZ03,Pizza especial,"Muzzarella, jamón, morrones y huevo.",13500,11900,Pizzas,https://images.unsplash.com/photo-1604382354936-07c5d9983bd3?w=600&q=70,18,8 porciones,Promo,si,si,3
+PZ04,Pizza de pepperoni,"Muzzarella y pepperoni picante.",12900,,Pizzas,https://images.unsplash.com/photo-1594007654729-407eedc4be65?w=600&q=70,16,8 porciones,Picante,no,si,4
+PZ05,Pizza de rúcula y parmesano,"Muzzarella, rúcula fresca y parmesano.",13200,,Pizzas,https://images.unsplash.com/photo-1593560708920-61dd98c46a4e?w=600&q=70,14,8 porciones,,no,si,5
+PZ06,Pizza vegetariana,"Muzzarella, morrón, cebolla, tomate y aceitunas.",12400,,Pizzas,https://images.unsplash.com/photo-1615719413546-198b25453f85?w=600&q=70,12,8 porciones,Vegetariana,no,si,6
+PZ07,Fugazzeta rellena,"Doble muzzarella y cebolla dorada.",13900,,Pizzas,https://images.unsplash.com/photo-1528137871618-79d2761e3fd5?w=600&q=70,10,8 porciones,,no,si,7
+HB01,Hamburguesa clásica,"Medallón de carne, lechuga, tomate y mayonesa casera.",8500,,Hamburguesas,https://images.unsplash.com/photo-1550547660-d9450f859349?w=600&q=70,20,unidad,,no,si,8
+HB02,Hamburguesa doble cheddar,"Dos medallones, doble cheddar y cebolla caramelizada.",11500,9900,Hamburguesas,https://images.unsplash.com/photo-1568901346375-23c9450c58cd?w=600&q=70,18,unidad,Más pedida,si,si,9
+HB03,Hamburguesa completa,"Carne, huevo, jamón, queso, lechuga y tomate.",9900,,Hamburguesas,https://images.unsplash.com/photo-1571091718767-18b5b1457add?w=600&q=70,16,unidad,,no,si,10
+HB04,Hamburguesa con cheddar y bacon,"Medallón, cheddar, bacon crocante y salsa barbacoa.",12200,,Hamburguesas,https://images.unsplash.com/photo-1607013251379-e6eecfffe234?w=600&q=70,14,unidad,,no,si,11
+PC01,Empanadas de carne cortada a cuchillo,"Media docena, fritas o al horno.",7500,6800,Para compartir,https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=70,25,media docena,Promo,si,si,12
+PC02,Alitas de pollo con salsa,"Ocho alitas con salsa barbacoa o picante.",8900,,Para compartir,https://images.unsplash.com/photo-1626074353765-517a681e40be?w=600&q=70,0,ocho unidades,,no,si,13
+PC03,Combo pizza + birra,"Una pizza de muzzarella y una cerveza artesanal de 1 litro.",14500,12900,Para compartir,https://images.unsplash.com/photo-1571407970349-bc81e7e96d47?w=600&q=70,12,combo,Oferta,no,si,14
+BB01,Pinta de cerveza tirada,"Cerveza artesanal de la casa, 500 ml.",4200,,Bebidas,https://images.unsplash.com/photo-1535958636474-b021ee887b13?w=600&q=70,40,500 ml,Artesanal,no,si,15
+BB02,Cerveza artesanal 1 litro,"Rubia o negra, elaborada en Tandil.",6800,,Bebidas,https://images.unsplash.com/photo-1436076863939-06870fe779c2?w=600&q=70,30,1 litro,,no,si,16
+BB03,"Gaseosa 1,5 litros","Línea Coca-Cola o Pepsi, bien fría.",3500,2900,Bebidas,https://images.unsplash.com/photo-1629203849820-fdd70d49c38e?w=600&q=70,45,"1,5 l",Promo,no,si,17
+BB04,Agua mineral 500 ml,"Sin gas.",2500,,Bebidas,https://images.unsplash.com/photo-1523362628745-0c100150b504?w=600&q=70,50,500 ml,,no,si,18
+PO01,Helado artesanal,"Cuarto kilo, dos gustos a elección.",4500,,Postres,https://images.unsplash.com/photo-1497034825429-c343d7c6a68f?w=600&q=70,20,1/4 kg,,no,si,19
+PO02,Tiramisú casero,"Porción individual.",5200,,Postres,https://images.unsplash.com/photo-1578985545062-69928b1d9587?w=600&q=70,12,porción,,no,si,20
+PO03,Postre de chocolate,"Mousse de chocolate con crema.",4800,4200,Postres,https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=70,10,porción,Oferta,no,si,21

@@ -43,7 +43,7 @@ try {
   if (guion === 'hero') {
     await evaluar('window.scrollTo(0, 0); true')
   } else if (guion === 'grilla') {
-    await evaluar("document.querySelector('#catalogo').scrollIntoView({ block: 'start' }); true")
+    await evaluar("document.querySelector('#menu').scrollIntoView({ block: 'start' }); true")
     await esperar(1000)
     await evaluar('window.scrollBy(0, 130); true')
   } else if (guion === 'carrito' || guion === 'pago') {
@@ -55,15 +55,15 @@ try {
     await esperar(1200)
 
     if (guion === 'pago') {
-      await evaluar(`(() => { const b = [...document.querySelectorAll('aside button')].find((x) => x.textContent.includes('Continuar con el pedido')); if (b) b.click(); return true; })()`)
+      await evaluar(`(() => { const b = [...document.querySelectorAll('aside button')].find((x) => x.textContent.includes('Continuar')); if (b) b.click(); return true; })()`)
       await esperar(1200)
       await evaluar(scriptLlenarCampo('#campo-nombre-y-apellido', 'Valentin Jurado'))
       await evaluar(scriptLlenarCampo('#campo-telefono-de-contacto', '2494 123456'))
       await evaluar(scriptLlenarCampo('#campo-direccion-de-entrega', 'Rivadavia 1234, Tandil'))
       await esperar(400)
-      await evaluar(scriptClickTexto('Elegir forma de pago'))
+      await evaluar(`(() => { const b = [...document.querySelectorAll('[role=dialog] button')].find((x) => x.textContent.trim() === 'Continuar'); if (b) b.click(); return true; })()`)
       await esperar(1200)
-      await evaluar(`[...document.querySelectorAll('[role=dialog] label')].find((l) => l.textContent.includes('Transferencia bancaria')).click()`)
+      await evaluar(`[...document.querySelectorAll('[role=dialog] label')].find((l) => l.textContent.includes('Transferencia')).click()`)
       await esperar(1500)
     }
   }

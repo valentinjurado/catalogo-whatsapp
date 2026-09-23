@@ -149,11 +149,12 @@ def construir(salida):
 
     # ---------------------------------------------------------------- portada
     historia.append(Spacer(1, 1.1 * cm))
-    historia.append(P('Catálogo + Carrito<br/>con checkout por WhatsApp', 'titulo'))
+    historia.append(P('Menú online + carrito<br/>con pedido por WhatsApp', 'titulo'))
     historia.append(P(
-        'Arquitectura y código base de una tienda online 100% estática para negocios locales: '
-        'sin base de datos tradicional, sin backend y sin pasarela de pago. El panel de '
-        'administración es un documento de Google Sheets y el pedido se cierra por WhatsApp.',
+        'Arquitectura y código base de un menú online 100% estático para locales gastronómicos: '
+        'sin base de datos tradicional, sin backend, sin pasarela de pago y sin publicar datos '
+        'bancarios. El panel de administración es un documento de Google Sheets y el pedido se '
+        'cierra por WhatsApp.',
         'subtitulo'))
 
     historia.append(tabla(
@@ -161,12 +162,13 @@ def construir(salida):
         [
             ['Stack', 'React 19 + Vite 8 + Tailwind CSS 4 + PapaParse'],
             ['Base de datos', 'Google Sheets publicado como CSV (solo lectura)'],
-            ['Pagos', 'Efectivo al recibir o transferencia bancaria (fuera de la web)'],
-            ['Confirmación', 'wa.me/número?text=… con pedido estructurado'],
-            ['Demo online', 'https://valentinjurado.github.io/catalogo-whatsapp/ (catálogo de ejemplo)'],
+            ['Administración', 'El propio Google Sheet: alta, edición, baja y stock'],
+            ['Pagos', 'Efectivo o transferencia. La web no publica alias ni CBU: el local lo pasa por el chat'],
+            ['Confirmación', 'wa.me/número?text=… con el pedido estructurado'],
+            ['Demo online', 'https://valentinjurado.github.io/catalogo-whatsapp/ (menú de ejemplo)'],
             ['Hosting', 'Vercel / Netlify / GitHub Pages (plan gratuito)'],
-            ['Costo mensual del negocio', 'Dominio (ej. .com.ar) — sin servidores ni licencias'],
-            ['Build de producción', '315,7 kB JS (97,0 kB gzip) + 40,1 kB CSS (8,0 kB gzip)'],
+            ['Costo mensual del local', 'Dominio (ej. .com.ar) — sin servidores ni licencias'],
+            ['Build de producción', '300,7 kB JS (93,5 kB gzip) + 37,5 kB CSS (7,7 kB gzip)'],
             ['Fecha del documento', date.today().strftime('%d/%m/%Y')],
         ],
         [4.2 * cm, 12.8 * cm]))
@@ -175,60 +177,103 @@ def construir(salida):
     historia.append(caja(
         '<b>Idea central.</b> El navegador del cliente hace un <i>fetch</i> al CSV del Google Sheets, '
         'arma el pedido en el carrito y, al confirmar, abre WhatsApp con el mensaje ya escrito. '
-        'No hay servidor que mantener, no hay datos de tarjetas en juego y no existe superficie para '
-        'inyección SQL porque no hay SQL.'))
+        'No hay servidor que mantener, no hay datos de tarjetas ni datos bancarios en juego, y no '
+        'existe superficie para inyección SQL porque no hay SQL.'))
 
     # ---------------------------------------------------------------- resumen
     historia.append(P('1. Resumen del sistema', 'h1'))
     historia.append(P(
         'El sistema tiene dos pantallas de uso y una planilla:', 'p'))
     historia.extend(bullets([
-        '<b>Vista cliente:</b> catálogo con buscador y filtros, carrito lateral (off-canvas), '
-        'checkout en 3 pasos y confirmación por WhatsApp.',
+        '<b>Vista cliente:</b> menú con buscador y filtros, carrito lateral (off-canvas), checkout en '
+        'dos pantallas (datos y entrega, forma de pago) y envío del pedido por WhatsApp.',
         '<b>Panel administrador:</b> el Google Sheets. El dueño del local carga, edita, oculta o '
-        'borra productos sin tocar código. Los cambios se ven en la web al recargar la página.',
+        'borra productos y cambia el stock sin tocar código. Los cambios se ven en la web al '
+        'recargar la página.',
         '<b>Sin backend ni base de datos:</b> el sitio es un paquete de archivos estáticos. '
         'No hay API keys, no hay credenciales, no hay costos de infraestructura.',
+        '<b>Sin datos de cobro en la web:</b> no hay pasarela, ni formulario de tarjeta, ni alias ni '
+        'CBU publicados. Si el cliente paga por transferencia, el alias viaja por el chat.',
     ]))
 
     historia.append(P('Flujo completo', 'h2'))
     historia.append(codigo("""
 CLIENTE                                        DUEÑO DEL LOCAL
 -------                                        ---------------
-1. abre la web         <---- CSV público <----  Google Sheets (productos)
-2. elige productos                               (precio, stock, oferta, foto)
-3. elige entrega: envío a domicilio o retiro
+1. abre la web y ve el MENU     <-- CSV <--    Google Sheets (carga el menu)
+   (los productos van primero)                  (agrega, edita, oculta, stock)
+2. elige productos
+3. elige entrega: envio a domicilio o retiro
 4. elige pago: efectivo o transferencia
-   (si es transferencia ve alias/CBU + copiar)
-5. confirma  ==>  wa.me + mensaje estructurado  ==>  WhatsApp del local
-                  (con nº de orden, detalle,    ==>  prepara y responde
-                   subtotales, entrega, pago)
-El pago NUNCA pasa por la web: se coordina por fuera (efectivo al recibir
-o transferencia bancaria con comprobante enviado por chat).
+   (no se muestran alias ni CBU)
+5. "Enviar pedido" ==> wa.me con el mensaje   ==>  WhatsApp del local
+   (n de pedido, detalle, totales,            ==>  prepara el pedido
+    entrega, pago y datos del cliente)        ==>  si es transferencia,
+                                                    pasa el alias por el chat
+El pago NUNCA pasa por la web y la web NO publica datos bancarios:
+se coordina por whatsapp (alias a pedido, o efectivo al recibir).
+En el celular, una barra fija mantiene el pedido a un toque.
 """))
 
-    historia.append(P('Por qué este diseño conviene al negocio', 'h2'))
+    historia.append(P('Por qué este diseño conviene al local', 'h2'))
     historia.extend(bullets([
         '<b>Costo casi nulo:</b> hosting gratuito + dominio. Nada de servidores, bases de datos ni '
         'suscripciones de pasarelas.',
         '<b>Cero riesgo financiero:</b> al no integrar cobros, no hay comisiones, ni cumplimiento '
-        'PCI-DSS, ni riesgo de fraude con tarjetas.',
-        '<b>Curva de administración nula:</b> el dueño ya sabe usar una planilla de cálculo; no hay '
-        'que enseñarle un panel nuevo.',
-        '<b>Rapidez:</b> el pedido llega a WhatsApp con todos los datos cargados, así el local '
-        'solo confirma y prepara (menos ida y vuelta, menos pedidos mal tomados).',
+        'PCI-DSS, ni datos de tarjetas, ni datos bancarios publicados.',
+        '<b>Menos fricción para el cliente:</b> no hay registro, no hay pantallas intermedias de '
+        'presentación y el pedido sale desde el carrito en dos pasos.',
+        '<b>Administración que el dueño ya sabe usar:</b> agrega y edita productos en una planilla '
+        '(incluso desde el celular), sin panel nuevo ni contraseñas.',
+        '<b>El pedido llega completo a WhatsApp:</b> número de pedido, detalle, totales, entrega, '
+        'forma de pago y datos del cliente. Menos ida y vuelta, menos pedidos mal tomados.',
         '<b>Publicación inmediata:</b> es un sitio estático: se copia a cualquier hosting y funciona.',
     ]))
 
     historia.append(PageBreak())
 
     # ------------------------------------------------- entregable 1: la planilla
-    historia.append(P('2. Estructura del Google Sheet (base de datos y panel)', 'h1'))
+    historia.append(P('2. El Google Sheet: base de datos y panel de administración', 'h1'))
     historia.append(P(
         'Una sola pestaña, con la fila 1 como encabezado. El nombre de las columnas es tolerante: '
         'no distingue mayúsculas ni tildes y acepta sinónimos (por ejemplo <i>título</i>, '
         '<i>titulo</i>, <i>nombre</i> o <i>producto</i>; <i>imagen</i>, <i>foto</i> o '
         '<i>url_imagen</i>).'))
+
+    historia.append(P('Cómo se administra el menú (no hay otro panel que el Sheet)', 'h2'))
+    historia.append(tabla(
+        ['Quiero…', 'Qué hago en la planilla', 'Qué pasa en la web'],
+        [
+            ['Agregar un producto', 'Escribo una fila nueva con <b>id</b>, <b>titulo</b> y <b>precio</b> '
+                                    '(el resto es opcional)', 'Aparece en el menú al recargar (caché de 10 min)'],
+            ['Modificar precio o texto', 'Edito la celda', 'El cliente lo ve al recargar la página'],
+            ['Eliminar un producto', 'Opción limpia y reversible: <b>activo = no</b>. Opción final: '
+                                     'borro la fila', 'Deja de mostrarse (y sale del carrito guardado)'],
+            ['Cambiar el stock', '<b>stock</b> = cantidad', 'Con <b>0</b> se muestra “Agotado” y no se puede pedir'],
+            ['Poner una oferta', 'Escribo el precio rebajado en <b>precio_oferta</b>',
+             'Precio anterior tachado + porcentaje de descuento'],
+            ['Reordenar el menú', '<b>orden</b> = 1, 2, 3… y <b>destacado = si</b>',
+             'Los destacados van primero y después manda el orden'],
+            ['Crear o quitar categorías', 'Uso o dejo de usar palabras en <b>categoria</b>',
+             'Los filtros de arriba se arman solos desde la planilla'],
+        ],
+        [3.1 * cm, 6.6 * cm, 7.3 * cm]))
+
+    historia.append(P(
+        'Se puede editar desde el celular con la app de Google Sheets. No hay usuarios, contraseñas '
+        'ni panel que mantener: el dueño necesita una cuenta de Google (gratis) y publicar la hoja '
+        'como CSV una sola vez; la URL no cambia nunca, así que no hay que volver a publicar el sitio.',
+        'chico'))
+
+    historia.append(P('Si algún día piden un panel web con login', 'h2'))
+    historia.extend(bullets([
+        '<b>Google Apps Script</b> como API (sigue siendo gratis): una Web App lee y escribe en la '
+        'misma hoja, protegida con una clave, y la web suma una pantalla de administración. Es la '
+        'opción más barata para no dejar de ser “cero servidor”.',
+        '<b>Backend real</b> (Supabase / Firebase): panel cómodo y multiusuario, pero agrega costos, '
+        'cuentas y mantenimiento. Se justifica con varios locales, stock que se descuenta solo o '
+        'pedidos guardados en base de datos.',
+    ]))
 
     historia.append(tabla(
         ['Columna', 'Oblig.', 'Ejemplo', 'Qué hace / formato'],
@@ -420,28 +465,29 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
   const L = []
   L.push(`*NUEVO PEDIDO ${pedido.numeroOrden}*`)            // *negrita* = marcado de WhatsApp
   L.push(`${negocio.marca.nombre} — ${fechaLegible(pedido.fecha)}`)
-  L.push('', '*Detalle del pedido*')
+
+  L.push('', '*Detalle*')
   pedido.items.forEach(i => {
     L.push(`• ${i.cantidad} x ${i.titulo}${i.unidad ? ` (${i.unidad})` : ''} — ${formatearPrecio(i.subtotalLinea)}`)
-    if (i.nota) L.push(`   ↳ Nota: ${i.nota}`)              // "sin cebolla", etc.
+    if (i.nota) L.push(`   ↳ ${i.nota}`)                    // "sin cebolla", etc.
   })
-  L.push('', `Subtotal (${pedido.unidades} ítems): ${formatearPrecio(pedido.subtotal)}`)
+
+  L.push('', `Subtotal: ${formatearPrecio(pedido.subtotal)}`)
   if (pedido.entrega === 'envio') {
     L.push(pedido.envio > 0 ? `Envío: ${formatearPrecio(pedido.envio)}` : 'Envío: sin cargo')
   }
   L.push(`*TOTAL: ${formatearPrecio(pedido.total)}*`)
-  L.push('', '*Entrega*', `Modalidad: ${pedido.entregaTexto}`)
+
+  L.push('', '*Entrega*', pedido.entregaTexto)
   if (pedido.entrega === 'envio') L.push(`Dirección: ${pedido.cliente.direccion}`)
   else                            L.push(`Retiro en: ${negocio.entrega.retiro.direccion}`)
-  L.push('', '*Pago*', `Forma de pago: ${pedido.pagoTexto}`)
-  if (pedido.pago === 'transferencia') {
-    L.push(`Alias: ${negocio.pago.transferencia.alias}`)
-    L.push(negocio.pago.transferencia.confirmacion + '.')   // frase exigida por el flujo
-  } else {
-    L.push(negocio.pago.efectivo.detalle)
-  }
-  L.push('', '*Cliente*', `Nombre: ${pedido.cliente.nombre}`,
-         `Teléfono: ${pedido.cliente.telefono}`)
+
+  // La web no publica datos bancarios: la línea del mensaje avisa al local
+  // si tiene que pasar el alias (transferencia) o si se abona al recibir.
+  const pago = pedido.pago === 'transferencia' ? negocio.pago.transferencia : negocio.pago.efectivo
+  L.push('', '*Pago*', pago.lineaMensaje)
+
+  L.push('', '*Cliente*', pedido.cliente.nombre, `Teléfono: ${pedido.cliente.telefono}`)
   return L.join('\\n')
 }
 
@@ -452,52 +498,47 @@ export function construirUrlWhatsapp(mensaje, numero = NEGOCIO.whatsapp.numero) 
 
     historia.append(P('Mensaje real generado durante la verificación', 'h2'))
     historia.append(codigo("""
-*NUEVO PEDIDO PED-260922-HKFL*
-Almacén Doña Rosa — 22/09/2026 22:39
+*NUEVO PEDIDO PED-260922-K3MA*
+Pizzería Don Mateo — 22/09/2026 23:40
 
-*Detalle del pedido*
-• 1 x Milanesa napolitana con guarnición (porción) — $ 8.500,00
-• 1 x Empanadas de carne cortada a cuchillo (media docena) — $ 6.500,00
-• 1 x Pollo al spiedo (unidad) — $ 11.500,00
+*Detalle*
+• 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00
+• 2 x Hamburguesa doble cheddar (unidad) — $ 19.800,00
 
-Subtotal (3 ítems): $ 26.500,00
+Subtotal: $ 29.600,00
 Envío: sin cargo (promoción)
 Ahorro por ofertas: -$ 2.000,00
-*TOTAL: $ 26.500,00*
+*TOTAL: $ 29.600,00*
 
 *Entrega*
-Modalidad: Envío a domicilio
+Envío a domicilio
 Dirección: Rivadavia 1234, Tandil
-Referencia: Porton negro, timbre 2
-Horario preferido: entre 20 y 21 hs
+Horario: entre 20 y 21
 
 *Pago*
-Forma de pago: Transferencia bancaria
-Alias: almacen.donarosa.mp
-Ya realicé el pago al alias indicado, te adjunto el comprobante.
+Transferencia: pasame el alias para transferir.
 
 *Cliente*
-Nombre: Valentin Jurado
+Valentin Jurado
 Teléfono: 2494 123456
 """))
     historia.append(P(
-        'La frase “Ya realicé el pago al alias indicado, te adjunto el comprobante” se incluye '
-        'automáticamente cuando el cliente elige transferencia, para que el local sepa que debe '
-        'esperar el comprobante en el chat.', 'chico'))
+        'El mensaje no incluye ningún dato bancario: la línea de pago se arma desde la configuración '
+        '(<font face="Courier" size="8">pago.transferencia.lineaMensaje</font>) y, cuando el cliente '
+        'elige transferencia, el propio pedido le avisa al local que tiene que pasar el alias. Si '
+        'elige efectivo, la línea dice que se abona al recibir.', 'chico'))
 
-    historia.append(P('Pantallas del flujo de pago (sin datos de tarjeta)', 'h2'))
+    historia.append(P('Pantallas del flujo de pago (sólo se elige cómo pagar)', 'h2'))
     historia.extend(bullets([
-        '<b>Paso 1 – Datos y entrega:</b> nombre, teléfono, dirección (solo si elige envío), '
-        'referencia para el repartidor, horario preferido y aclaraciones. Validación en vivo por campo.',
-        '<b>Paso 2 – Forma de pago:</b> Efectivo (se abona al recibir) o Transferencia. Al elegir '
-        'transferencia se muestra una ficha con Alias, CBU/CVU, titular, banco, CUIT y el importe '
-        'exacto, cada dato con botón <i>Copiar</i>, más los 3 pasos a seguir y un check de '
-        'conformidad. No hay ningún campo de tarjeta en toda la aplicación.',
-        '<b>Paso 3 – Confirmar:</b> resumen del pedido con número de orden y totales; el botón es un '
-        'enlace real a <font face="Courier" size="8">wa.me</font> (si el navegador bloquea ventanas '
-        'emergentes, el enlace igual funciona).',
-        '<b>Cierre:</b> pantalla de éxito con el número de orden, botón para reabrir WhatsApp y opción '
-        'de copiar el resumen como comprobante del armado.',
+        '<b>Carrito lateral:</b> cantidades, aclaración por producto, modalidad de entrega, barra de '
+        'progreso hacia el envío gratis y totales. El botón dice <i>Continuar</i>.',
+        '<b>Pantalla 1 – Datos y entrega:</b> nombre, teléfono, dirección (sólo si elige envío), '
+        'referencia para el repartidor, horario preferido y aclaraciones. Validación por campo.',
+        '<b>Pantalla 2 – Forma de pago:</b> Efectivo o Transferencia, y el botón verde '
+        '<i>Enviar pedido</i> que abre WhatsApp con todo escrito. No hay pantalla de confirmación '
+        'aparte, ni datos bancarios, ni campos de tarjeta.',
+        '<b>Cierre:</b> número de pedido a la vista, botón para reabrir WhatsApp y opción de copiar '
+        'el pedido como comprobante del armado.',
     ]))
 
     historia.append(PageBreak())
@@ -533,13 +574,12 @@ catalogo-whatsapp/
    │  └─ CarritoContext.jsx estado global + persistencia en localStorage
    ├─ hooks/
    │  ├─ useCatalogo.js     carga con caché y refresco en segundo plano
-   │  └─ useCopiar.js       copiar alias/CBU con respaldo y aviso de fallo
+   │  └─ useCopiar.js       copiar (pedido) con respaldo y aviso de fallo
    ├─ components/
-   │  ├─ layout/   Header · Hero · Footer
+   │  ├─ layout/   Header · Footer
    │  ├─ catalogo/ Catalogo · Filtros · ProductCard
    │  ├─ carrito/  CartWidget (off-canvas) · ItemCarrito · SelectorEntrega · BarraPedidoMovil
-   │  ├─ checkout/ CheckoutModal · PasoDatos · PasoPago · DatosTransferencia
-   │  │             PasoConfirmar · PantallaExito
+   │  ├─ checkout/ CheckoutModal · PasoDatos · PasoPago · PantallaExito
    │  └─ ui/       Boton · Modal · Toast · Campo · ImagenProducto · Estados · Iconos
    ├─ App.jsx              composición de la página
    └─ main.jsx             tema, SEO y providers
@@ -560,14 +600,14 @@ catalogo-whatsapp/
     historia.append(tabla(
         ['Qué se cambia', 'Dónde', 'Efecto'],
         [
-            ['Nombre, eslogan, logo', 'marca.*', 'Encabezado, pie, título de la página (SEO)'],
-            ['Paleta y redondeo', 'marca.tema / marca.radio', '6 paletas listas: verde, azul, bordo, naranja, violeta, grafito'],
-            ['Número de WhatsApp', 'whatsapp.numero / nombreVendedor', 'Destino de todos los pedidos y saludo del mensaje'],
-            ['Origen de productos', 'catalogo.hojaCsv o hojaId+gid', 'Se conecta el Sheet del cliente'],
-            ['Envío', 'entrega.envio.* / entrega.retiro.*', 'Costo, envío gratis desde X, zona, demora, dirección y horarios'],
-            ['Cobro', 'pago.efectivo / pago.transferencia', 'Alias, CBU, titular, banco y textos del aviso'],
-            ['Formulario', 'pedido.campos.*', 'Qué se le pide al cliente (dirección solo si hay envío)'],
-            ['Todos los textos', 'textos.*', 'Portada, avisos y pie, sin buscar en componentes'],
+        ['Nombre, eslogan, logo', 'marca.*', 'Encabezado, pie, título de la página (SEO)'],
+        ['Paleta y redondeo', 'marca.tema / marca.radio', '6 paletas listas: naranja, verde, azul, bordo, violeta, grafito'],
+        ['Número de WhatsApp', 'whatsapp.numero / nombreVendedor', 'Destino de todos los pedidos y saludo del mensaje'],
+        ['Origen de productos', 'catalogo.hojaCsv o hojaId+gid', 'Se conecta el Sheet del cliente'],
+        ['Envío', 'entrega.envio.* / entrega.retiro.*', 'Costo, envío gratis desde X, zona, demora, dirección y horarios'],
+        ['Formas de pago', 'pago.efectivo / pago.transferencia', 'Qué se ofrece al cliente y qué línea va al mensaje (acá se decide si hay que pasar el alias)'],
+        ['Formulario', 'pedido.campos.*', 'Qué se le pide al cliente (dirección sólo si hay envío)'],
+        ['Textos', 'textos.*', 'Pie legal, sin buscar en componentes'],
         ],
         [4.4 * cm, 4.6 * cm, 8.0 * cm]))
 
@@ -582,6 +622,7 @@ catalogo-whatsapp/
             ['Inyección SQL', 'No', 'No existe base de datos ni consultas: los datos son un CSV público de lectura.'],
             ['Robo de credenciales', 'No', 'No hay login, ni tokens, ni API keys en el front. La hoja solo se lee.'],
             ['Datos de tarjetas (PCI)', 'No', 'No se piden ni se procesan medios de pago en la web.'],
+            ['Datos bancarios publicados', 'No', 'La web no muestra alias ni CBU. Si el cliente paga por transferencia, el local comparte el alias por el chat, donde queda el pedido.'],
             ['Pagos fraudulentos', 'No', 'No hay pasarela: el cobro se acuerda por fuera y lo controla el local.'],
             ['XSS desde la planilla', 'Mitigado', 'React escapa todo texto interpolado; no se usa innerHTML ni dangerouslySetInnerHTML.'],
             ['Manipulación de precios', 'Mitigado', 'El total se recalcula desde los precios del catálogo; el mensaje lleva el detalle para que el local lo verifique.'],
@@ -644,12 +685,14 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
         [
             ['Linter (oxlint)', 'OK — 0 avisos en src/ y scripts/'],
             ['Compilación de producción', 'OK — 50 módulos, build en ~0,5 s'],
-            ['Pruebas de lógica (npm test)', 'OK — 14/14 (precios, totales, envío, validaciones, nº de orden, mensaje, link)'],
-            ['Validador del CSV (npm run validar)', 'OK — 20 filas, 20 productos activos, 5 categorías, 0 problemas'],
-            ['Fotos del demo', '26 URLs verificadas (HTTP 200); 20/20 cargan y se pintan (600×450)'],
-            ['E2E navegador real (npm run e2e)', 'OK — 35/35 comprobaciones, repetible entre corridas'],
-            ['Link de WhatsApp', 'OK — wa.me/549249… con mensaje codificado completo, sin espacios sin codificar'],
-            ['Persistencia', 'OK — el carrito y el número de orden sobreviven al recargar (localStorage)'],
+            ['Pruebas de lógica (npm test)', 'OK — 15/15 (precios, totales, envío, validaciones, nº de pedido, mensaje, link)'],
+            ['Validador del menú (npm run validar)', 'OK — 21 productos, 21 activos, 5 categorías, 0 problemas'],
+            ['Fotos del menú', '34 URLs verificadas (HTTP 200); 21/21 cargan y se pintan (600×450)'],
+            ['E2E navegador real (npm run e2e)', 'OK — 38/38 comprobaciones, repetible entre corridas'],
+            ['Bug de usabilidad (foco al escribir)', 'Corregido y verificado: el campo conserva el foco en cada tecla'],
+            ['Sin datos bancarios', 'Verificado: la pantalla de pago y el mensaje no contienen alias, CBU ni CVU'],
+            ['Link de WhatsApp', 'OK — wa.me con el mensaje codificado completo y sin espacios sin codificar'],
+            ['Persistencia', 'OK — el carrito y el número de pedido sobreviven al recargar (localStorage)'],
             ['Responsive', 'OK — capturas en 1440×900 y 390×844 con barra de pedido fija en el celular'],
         ],
         [6.4 * cm, 10.6 * cm]))
@@ -703,18 +746,19 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
         ]
 
     historia += captura('captura-escritorio.png',
-                        'Catálogo en escritorio (1440 px): filtros generados desde la planilla, ofertas con '
-                        'precio tachado y porcentaje, etiquetas y botón de agregar por tarjeta.')
+                        'El menú es lo primero que ve el cliente (1440 px): filtros generados desde la '
+                        'planilla, ofertas con precio tachado y porcentaje, etiquetas, y el botón de '
+                        'agregar en cada tarjeta.')
     historia += captura('captura-pago.png',
-                        'Paso 2 del checkout: forma de pago. Al elegir transferencia aparecen Alias, CBU/CVU, '
-                        'titular, banco y el importe exacto, cada dato con botón Copiar. No existe ningún campo '
-                        'de tarjeta en toda la aplicación.')
+                        'Pantalla de forma de pago: sólo se elige entre efectivo y transferencia. No hay '
+                        'datos bancarios, ni campos de tarjeta, ni un paso extra de confirmación: el botón '
+                        'verde abre WhatsApp con el pedido escrito.')
     historia += captura('captura-carrito.png',
                         'Carrito lateral (off-canvas): cantidades, aclaración por producto, modalidad de '
                         'entrega, barra de progreso hacia el envío gratis y totales.')
     historia += captura('captura-movil.png',
-                        'Versión móvil (390 px): la barra inferior fija mantiene el pedido a un toque de '
-                        'distancia. La vista está pensada mobile-first.')
+                        'Versión móvil (390 px): el menú arranca sin pantallas de presentación y la barra '
+                        'inferior fija mantiene el pedido a un toque de distancia.')
     historia.append(P(
         'Nota sobre las capturas: se tomaron con un navegador headless (sin ventana). En ese entorno las '
         'transiciones CSS no progresan y las imágenes con carga diferida no se descargan; el script '
@@ -729,23 +773,25 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
     historia.append(P('Límites por diseño (conviene decirlos antes de vender)', 'h2'))
     historia.extend(bullets([
         'No hay stock en tiempo real ni reserva de mercadería: el local confirma por WhatsApp.',
-        'El catálogo se actualiza cuando el cliente recarga la página (la caché dura 10 minutos).',
-        'El <i>id</i> de cada producto debe ser único y estable: es lo que identifica la línea del carrito.',
+        'El menú se actualiza cuando el cliente recarga la página (la caché dura 10 minutos).',
+        'La web no publica datos bancarios: el alias se pasa por el chat cuando el cliente elige '
+        'transferencia (queda registrado en la conversación).',
+        'El <i>id</i> de cada producto debe ser único y estable: es lo que identifica la línea del pedido.',
         'Los pedidos no quedan registrados en ningún sistema; el historial es el chat de WhatsApp.',
         'Para ver el modo demostración hay que servir el sitio (dev/preview/hosting): abrir el archivo '
         'con doble clic no permite leer el CSV por restricciones del navegador.',
         'Los precios son responsabilidad de la planilla: la web muestra exactamente lo que dice la hoja.',
     ]))
 
-    historia.append(P('Checklist de entrega por cliente', 'h2'))
+    historia.append(P('Checklist de entrega por local', 'h2'))
     historia.extend(bullets([
         'Cargar marca (nombre, eslogan, tema, logo) en <font face="Courier" size="8">negocio.js</font>.',
         'Cargar el número de WhatsApp real y probar un pedido de punta a punta desde un celular.',
         'Configurar envío (costo, envío gratis desde, zona, demora) y datos de retiro.',
-        'Verificar alias/CBU/titular con el dueño y hacer una transferencia de prueba.',
-        'Importar <font face="Courier" size="8">docs/plantilla-google-sheet.csv</font> y cargar los productos reales.',
+        'Definir con el dueño las formas de pago y la línea que va al mensaje (si hay que pasar el alias).',
+        'Importar <font face="Courier" size="8">docs/plantilla-google-sheet.csv</font> y cargar el menú real.',
         'Publicar la hoja como CSV, pegar la URL y correr el validador.',
-        'Reemplazar el favicon y revisar los textos de portada.',
+        'Reemplazar el favicon y revisar los textos del pie.',
         'Publicar en el hosting y entregar la URL + una guía de una página para el dueño.',
     ]))
 

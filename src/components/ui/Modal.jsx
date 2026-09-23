@@ -3,11 +3,14 @@ import { createPortal } from 'react-dom'
 import { IconoCerrar } from './Iconos'
 
 /**
- * Modal accesible y liviano (sin librerías):
- *  - renderiza en un portal sobre el <body>
- *  - cierra con Escape o clic en el fondo
- *  - bloquea el scroll del documento
- *  - atrapa el foco dentro del diálogo
+ * Modal accesible y liviano (sin librerías): portal sobre <body>, cierre con
+ * Escape o clic en el fondo, scroll bloqueado y foco atrapado.
+ *
+ * IMPORTANTE (bug corregido): el efecto depende SOLO de `abierto`. Si dependiera
+ * también de `onCerrar` (que cambia de identidad en cada render del padre), el
+ * efecto se re-ejecutaría en cada tecla → el cleanup devolvía el foco al elemento
+ * anterior y se volvía a enfocar el primer campo: el usuario perdía el foco
+ * mientras escribía. El handler se guarda en un ref, siempre fresco.
  */
 export default function Modal({
   abierto,
@@ -19,6 +22,13 @@ export default function Modal({
   anchoMax = 'max-w-lg',
 }) {
   const refDialogo = useRef(null)
+  const refCerrar = useRef(onCerrar)
+  // El handler se actualiza en un efecto: el efecto de abajo depende solo de
+  // `abierto`, así no se re-ejecuta en cada render del padre (eso era lo que
+  // hacía perder el foco al escribir).
+  useEffect(() => {
+    refCerrar.current = onCerrar
+  }, [onCerrar])
 
   useEffect(() => {
     if (!abierto) return
@@ -29,7 +39,7 @@ export default function Modal({
     const alTeclear = (e) => {
       if (e.key === 'Escape') {
         e.stopPropagation()
-        onCerrar?.()
+        refCerrar.current?.()
         return
       }
       if (e.key !== 'Tab') return
@@ -61,7 +71,7 @@ export default function Modal({
       document.body.style.overflow = overflow
       anterior?.focus?.()
     }
-  }, [abierto, onCerrar])
+  }, [abierto])
 
   if (!abierto) return null
 

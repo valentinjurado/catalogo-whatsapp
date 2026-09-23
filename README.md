@@ -1,20 +1,22 @@
-# Catálogo WhatsApp — plantilla white-label para negocios locales
+# Menú + Carrito con pedido por WhatsApp
 
-**Demo online:** https://valentinjurado.github.io/catalogo-whatsapp/ (catálogo de ejemplo, 20 productos)
+Plantilla de menú online para locales gastronómicos (pizzerías, hamburgueserías,
+rotiserías, casas de comida): el cliente arma el pedido en la web y lo confirma por
+WhatsApp. **Sin base de datos, sin backend, sin pasarela de pago y sin datos
+bancarios publicados.** El panel de administración es un Google Sheet y el sitio es
+estático (se publica gratis en Vercel, Netlify o GitHub Pages).
 
-Web de catálogo + carrito que termina en un pedido por WhatsApp.
-**Sin base de datos, sin backend, sin pasarela de pago.** El "panel de administración"
-es un Google Sheet y el sitio es estático (se publica gratis en Vercel, Netlify o
-GitHub Pages).
+**Demo:** https://valentinjurado.github.io/catalogo-whatsapp/
 
 ```
-Cliente                                 Dueño del local
-──────                                  ───────────────
-navega catálogo  ◄── CSV público ──     Google Sheets (carga productos)
-arma carrito
+Cliente                                    Dueño del local
+──────                                     ───────────────
+ve el menú        ◄── CSV público ◄──      Google Sheets (carga el menú)
+arma el pedido
 elige entrega (envío / retiro)
 elige pago (efectivo / transferencia)
-confirma  ──────► wa.me + mensaje estructurado ──────►  WhatsApp del local
+"Enviar pedido"  ──► wa.me + mensaje ──►   WhatsApp del local
+                     estructurado         (si es transferencia, pasa el alias)
 ```
 
 ## 1. Arrancar
@@ -24,167 +26,184 @@ npm install
 npm run dev            # http://localhost:5173
 npm run build          # genera dist/ listo para publicar
 npm run lint           # oxlint sobre src/ y scripts/ (esperado: 0 avisos)
-npm test               # 14 pruebas de la lógica pura (sin navegador)
-npm run validar:demo   # valida el CSV de ejemplo con el mismo parser de la web
+npm test               # 15 pruebas de la lógica pura (sin navegador)
+npm run validar:demo   # valida el CSV del menú con el mismo parser de la web
 npm run preview        # sirve dist/ en http://localhost:4173
-npm run e2e            # flujo de compra completo en un navegador real (35 comprobaciones)
+npm run e2e            # flujo de compra completo en un navegador real (38 comprobaciones)
 ```
 
 Las herramientas de verificación necesitan un navegador Chromium con el puerto de
-depuración abierto (lo usan `npm run e2e` y `scripts/capturar.mjs`):
+depuración abierto (las usan `npm run e2e` y `scripts/capturar.mjs`):
 
 ```bash
-# ejemplo en Windows (perfil temporal, no toca tu navegador personal)
 msedge.exe --headless=new --remote-debugging-port=9222 --user-data-dir=C:\tmp\edge-e2e --no-sandbox
 ```
 
-## 2. Configurar el negocio (10 minutos)
+## 2. Configurar el local (10 minutos)
 
-Todo se edita en **`src/config/negocio.js`**. Nada más:
+Todo se edita en **`src/config/negocio.js`**:
 
 | Sección | Qué define |
 |---|---|
-| `marca` | nombre, eslogan, `tema` (verde/azul/bordo/naranja/violeta/grafito), `radio`, logo |
-| `whatsapp` | número que recibe los pedidos (formato `549...`) y nombre del vendedor |
+| `marca` | nombre, eslogan, `tema` (naranja/verde/azul/bordo/violeta/grafito), radio, logo |
+| `whatsapp.numero` | número que recibe los pedidos (`549...`, sin + ni espacios) |
 | `catalogo` | URL del Google Sheet (CSV publicado) o `hojaId` + `gid` |
-| `entrega` | costo de envío, envío gratis desde X, zona, demora, dirección de retiro, horarios |
-| `pago` | efectivo sí/no, alias, CBU, titular, banco, textos del aviso |
+| `entrega` | costo de envío, envío gratis desde X, zona, demora, dirección y horarios de retiro |
+| `pago` | qué formas de pago se muestran y **qué línea va al mensaje** |
 | `pedido` | mínimo de compra, moneda, qué campos se le piden al cliente |
-| `textos` | todos los textos de portada y avisos |
+| `textos` | textos libres (pie legal) |
 
-El tema de color se aplica por variables CSS en tiempo de ejecución: **cambiar
-`marca.tema` no requiere recompilar Tailwind** ni tocar componentes.
+El tema de color se aplica con variables CSS en tiempo de ejecución: cambiar
+`marca.tema` **no requiere recompilar Tailwind** ni tocar componentes.
 
-## 3. Google Sheet como base de datos
+## 3. Administración del menú: el Google Sheet
 
-### Columnas (la fila 1 debe tener exactamente estos encabezados)
+No hay panel separado: **el Sheet es el panel**. Ahí se hace todo y la web lo refleja
+sola (la URL de la hoja nunca cambia, no hay que tocar código ni volver a publicar).
 
-| Columna | Obligatoria | Ejemplo | Notas |
+| Quiero… | Qué hago en la planilla |
+|---|---|
+| **Agregar** un producto | Escribo una fila nueva al final con `id`, `titulo` y `precio` (lo demás es opcional) |
+| **Modificar** precio o texto | Edito la celda. El cliente lo ve al recargar la página (máx. 10 minutos de caché) |
+| **Eliminar** un producto | Opción limpia: pongo `no` en `activo` (deja de mostrarse y es reversible). Opción final: borro la fila |
+| **Cambiar el stock** | `stock` = cantidad. Con `0` el producto se muestra **Agotado** y no se puede pedir. Vacío = sin control de stock |
+| **Poner una oferta** | Escribo el precio rebajado en `precio_oferta`: se muestra tachado y con el % de descuento |
+| **Reordenar** el menú | Uso la columna `orden` (1, 2, 3…) y `destacado = si` para los que van primero |
+| **Categorías** | Las genera la columna `categoria` (ej. Pizzas, Hamburguesas, Bebidas); se arman los filtros solos |
+| **Sacar una categoría** | Se deja de usar la palabra en `categoria` y desaparece del filtro |
+
+Se puede editar desde el celular con la app de Google Sheets. No hay usuarios,
+contraseñas ni panel que mantener. El dueño necesita tener la hoja en su cuenta de
+Google (es gratis) y dejarla publicada como CSV una sola vez.
+
+### Si algún día quiere un panel web con login y formularios
+
+Posible sin cambiar la arquitectura, pero ya no es "cero backend":
+
+1. **Google Apps Script** como API (gratis): una Web App que lee y escribe en la
+   misma hoja, protegida con una clave; la web agrega una pantalla `/admin`. Es la
+   opción más barata para seguir sin servidores.
+2. **Backend real** (Supabase/Firebase): panel cómodo y multiusuario, pero agrega
+   costos, cuentas y mantenimiento. Recién se justifica con varios locales, stock
+   real con descuento automático o pedidos guardados en base.
+
+### Columnas de la planilla
+
+| Columna | Oblig. | Ejemplo | Notas |
 |---|---|---|---|
-| `id` | no | `MIL01` | Si falta, se genera desde el título. **No repetir**: el carrito los mezcla |
-| `titulo` | **sí** | `Milanesa napolitana` | Fila sin título = ignorada |
-| `descripcion` | no | `Con muzzarella y guarnición` | Se recorta a 2 líneas en la tarjeta |
-| `precio` | **sí** | `8500` o `8.500,50` | Acepta `$`, puntos y comas |
-| `precio_oferta` | no | `7500` | Si es menor al precio, se muestra tachado + `%` de descuento |
-| `categoria` | no | `Rotisería` | Genera los filtros de arriba del catálogo |
-| `url_imagen` | no | `https://...jpg` | Google Drive: usar `https://drive.google.com/uc?export=view&id=ID` |
-| `stock` | no | `12` | `0` = Agotado (no se puede agregar). Vacío = sin control de stock |
-| `unidad` | no | `kg`, `docena` | Se muestra como `/ kg` al lado del precio |
-| `etiquetas` | no | `Popular,Oferta` | Máx. 2 por producto, separadas por coma |
-| `destacado` | no | `si` | Los destacados aparecen primero |
-| `activo` | no | `si` o `no` | `no` = no se publica (borrado lógico) |
-| `orden` | no | `1`, `2`, `3` | Orden manual dentro de la categoría |
+| `id` | no | `PZ01` | Si falta se genera desde el título. **No repetir**: el carrito agrupa por id |
+| `titulo` | **sí** | `Pizza muzzarella al molde` | Fila sin título = ignorada |
+| `descripcion` | no | `Masa al molde, muzzarella y aceitunas` | Se recorta a 2 líneas en la tarjeta |
+| `precio` | **sí** | `9800` o `9.800,50` | Acepta `$`, puntos y comas |
+| `precio_oferta` | no | `8900` | Si es menor al precio: tachado + % de descuento |
+| `categoria` | no | `Pizzas` | Arma los filtros del menú |
+| `url_imagen` | no | `https://…jpg` | En Drive: `drive.google.com/uc?export=view&id=ID` |
+| `stock` | no | `12` | `0` = Agotado. Vacío = sin control |
+| `unidad` | no | `8 porciones` | Se muestra como `/ 8 porciones` junto al precio |
+| `etiquetas` | no | `Más pedida,Promo` | Hasta 2 etiquetas, separadas por coma |
+| `destacado` | no | `si` | Ordena primero |
+| `activo` | no | `si` / `no` | `no` = no se publica (borrado lógico) |
+| `orden` | no | `1` | Orden manual dentro de la categoría |
 
-El parser acepta alias y no distingue mayúsculas ni tildes: `Título`=`titulo`,
-`Imagen`=`url_imagen`, `Precio Oferta`=`precio_oferta`, y `si/true/1/x` valen
-como verdadero.
+El parser tolera alias y no distingue mayúsculas ni tildes (`Título` = `titulo`,
+`Imagen` = `url_imagen`, `si/true/1/x` = verdadero). Plantilla lista para importar:
+`docs/plantilla-google-sheet.csv`.
 
-Plantilla lista para importar: `docs/plantilla-google-sheet.csv`
-(Google Sheets → Archivo → Importar → Subir → *Reemplazar hoja de cálculo*).
+> ⚠️ Si un texto lleva **comas** (por ejemplo `Docena con membrillo, crema y dulce`),
+> la celda debe ir entre comillas al exportar a CSV. El validador
+> (`npm run validar`) lo detecta antes de publicar.
 
-### Publicar como CSV
+### Publicar la hoja como CSV
 
-**Opción A (recomendada):** Archivo → Compartir → **Publicar en la web** →
-pestaña de productos → formato **CSV** → Publicar → copiar la URL → pegarla en
-`catalogo.hojaCsv`.
+**Opción A (recomendada):** Archivo → Compartir → **Publicar en la web** → elegir la
+pestaña y el formato **CSV** → Publicar → pegar la URL en `catalogo.hojaCsv`.
 
-**Opción B:** dejar la hoja como "cualquiera con el enlace puede ver" y pegar
-sólo el ID en `catalogo.hojaId` (+ `gid` de la pestaña; el `gid` está al final
-de la URL, después de `#gid=`).
+**Opción B:** compartir como "cualquiera con el enlace puede ver" y pegar sólo el ID
+del documento en `catalogo.hojaId` + el `gid` de la pestaña.
 
-> Editar la hoja nunca rompe la web: si Google falla, el sitio sigue mostrando
-> el último catálogo guardado en el navegador del cliente.
+## 4. Flujo de compra
 
-## 4. Estructura del proyecto
+1. **Menú**: buscador, filtros por categoría y ordenamiento. Los productos aparecen
+   primero, sin pantallas de presentación.
+2. **Carrito lateral**: cantidades, aclaración por producto ("sin cebolla"), modalidad
+   de entrega, barra de progreso hacia el envío gratis y totales.
+3. **Checkout en dos pantallas**: datos y entrega → forma de pago.
+4. **Pago**: el cliente sólo elige **Efectivo** o **Transferencia**. La web no publica
+   alias, CBU ni ningún dato bancario: si elige transferencia, ese mismo pedido le
+   avisa al local por el chat que tiene que pasar el alias.
+5. **Enviar pedido**: se abre `wa.me` con el mensaje ya escrito (número de pedido,
+   detalle, totales, entrega, pago y datos del cliente) y después se muestra el
+   número de pedido para tenerlo a mano.
+
+### Ejemplo del mensaje que le llega al local
 
 ```
-catalogo-whatsapp/
+*NUEVO PEDIDO PED-260922-K3MA*
+Pizzería Don Mateo — 22/09/2026 23:40
+
+*Detalle*
+• 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00
+• 2 x Hamburguesa doble cheddar (unidad) — $ 19.800,00
+
+Subtotal: $ 29.600,00
+Envío: sin cargo (promoción)
+Ahorro por ofertas: -$ 2.000,00
+*TOTAL: $ 29.600,00*
+
+*Entrega*
+Envío a domicilio
+Dirección: Rivadavia 1234, Tandil
+Horario: entre 20 y 21
+
+*Pago*
+Transferencia: pasame el alias para transferir.
+
+*Cliente*
+Valentin Jurado
+Teléfono: 2494 123456
+```
+
+## 5. Estructura del proyecto
+
+```
 ├─ public/
-│  ├─ productos-demo.csv        # catálogo de ejemplo (modo demo)
+│  ├─ productos-demo.csv        menú de ejemplo (modo demo)
 │  └─ favicon.svg
 ├─ docs/
 │  ├─ plantilla-google-sheet.csv
-│  ├─ ARQUITECTURA.pdf          arquitectura + código + capturas + verificación
+│  ├─ ARQUITECTURA.pdf          arquitectura, código, capturas y verificación
 │  ├─ e2e-resultado.json        informe de la última corrida de npm run e2e
 │  └─ generar-pdf-arquitectura.py
 ├─ scripts/
-│  ├─ validar-catalogo.mjs      valida tu CSV antes de publicar
-│  ├─ test-servicios.mjs        14 pruebas de la lógica pura
+│  ├─ validar-catalogo.mjs      valida el CSV antes de publicar
+│  ├─ test-servicios.mjs        15 pruebas de la lógica pura
 │  ├─ cdp.mjs                   conexión CDP reutilizable (sin dependencias)
-│  ├─ e2e.mjs                   flujo de compra completo (35 comprobaciones)
+│  ├─ e2e.mjs                   flujo de compra completo (38 comprobaciones)
 │  └─ capturar.mjs              capturas para la ficha de venta
 └─ src/
    ├─ config/
-   │  ├─ negocio.js             # ⚙️ ÚNICO archivo a editar por negocio
-   │  └─ paletas.js             # colores y tema en runtime
-   ├─ services/                 # lógica sin React (testeable)
-   │  ├─ catalogo.js            # CSV de Sheets → JSON (+ caché + reintentos)
-   │  ├─ pedido.js              # totales, número de orden, validaciones
-   │  ├─ whatsapp.js            # mensaje estructurado + link wa.me
-   │  └─ formato.js             # precios, fechas, normalización de texto
-   ├─ state/
-   │  ├─ carritoReducer.js      # reglas del carrito (puro)
-   │  └─ CarritoContext.jsx     # estado global + persistencia
-   ├─ hooks/
-   │  ├─ useCatalogo.js         # fetch + caché + estado de carga
-   │  └─ useCopiar.js           # copiar alias/CBU con respaldo
+   │  ├─ negocio.js             ⚙️ ÚNICO archivo a editar por local
+   │  └─ paletas.js             6 paletas aplicadas en runtime (CSS vars)
+   ├─ services/                 lógica sin React, testeable
+   │  ├─ catalogo.js            CSV de Sheets → JSON (+ caché + errores claros)
+   │  ├─ pedido.js              totales, envío, nº de pedido, validaciones
+   │  ├─ whatsapp.js            mensaje estructurado + link wa.me
+   │  └─ formato.js             precios, fechas, normalización de texto
+   ├─ state/                    carrito global (reducer + persistencia)
+   ├─ hooks/                    useCatalogo, useCopiar
    ├─ components/
-   │  ├─ layout/    Header · Hero · Footer
+   │  ├─ layout/    Header · Footer
    │  ├─ catalogo/  Catalogo · Filtros · ProductCard
    │  ├─ carrito/   CartWidget (off-canvas) · ItemCarrito · SelectorEntrega · BarraPedidoMovil
-   │  ├─ checkout/  CheckoutModal · PasoDatos · PasoPago · DatosTransferencia · PasoConfirmar · PantallaExito
+   │  ├─ checkout/  CheckoutModal · PasoDatos · PasoPago · PantallaExito
    │  └─ ui/        Boton · Modal · Toast · Campo · ImagenProducto · Estados · Iconos
    ├─ App.jsx
    └─ main.jsx
 ```
 
-Regla de oro de la arquitectura: **`services/` no importa React** y
-**`components/` no hace fetch**. Los componentes reciben datos y emiten
-acciones; los efectos (red, almacenamiento) viven en hooks y servicios.
-
-## 5. Flujo del pedido
-
-1. **Carrito lateral** (`CartWidget`): cantidades, notas por producto, modalidad
-   de entrega, barra de progreso hacia el envío gratis y totales.
-2. **CheckoutModal en 3 pasos**: datos y entrega → forma de pago → confirmar.
-3. **Pago**: si elige *transferencia*, se muestran alias/CBU/titular con botón
-   *Copiar* y el recordatorio de adjuntar el comprobante. Si elige *efectivo*,
-   se aclara que se abona al recibir. **Nunca se piden datos de tarjeta.**
-4. **Confirmación**: se genera un número de orden (`PED-261004-7K3F`), se arma el
-   mensaje y se abre `https://wa.me/<numero>?text=<mensaje codificado>`.
-5. **Pantalla de éxito**: número de orden, botón para reabrir WhatsApp y
-   "copiar resumen".
-
-### Ejemplo real de mensaje generado
-
-```
-*NUEVO PEDIDO PED-261004-7K3F*
-Almacén Doña Rosa — 04/10/2026 20:14
-
-*Detalle del pedido*
-• 2 x Milanesa napolitana (porción) — $17.000,00
-   ↳ Nota: sin cebolla
-• 1 x Coca-Cola 1,5 L — $2.900,00
-
-Subtotal (3 ítems): $19.900,00
-Envío: sin cargo (promoción)
-Ahorro por ofertas: -$1.800,00
-*TOTAL: $19.900,00*
-
-*Entrega*
-Modalidad: Envío a domicilio
-Dirección: Rivadavia 1234, Tandil
-Horario preferido: entre 20 y 21 hs
-
-*Pago*
-Forma de pago: Transferencia bancaria
-Alias: almacen.donarosa.mp
-Ya realicé el pago al alias indicado, te adjunto el comprobante.
-
-*Cliente*
-Nombre: Juan Pérez
-Teléfono: 2494 123456
-```
+Reglas de la arquitectura: **`services/` no importa React** y **`components/` no hace
+fetch**. La lógica de negocio se testea sin navegador (15 pruebas) y el flujo real se
+verifica con el E2E (38 comprobaciones).
 
 ## 6. Publicar (hosting gratis)
 
@@ -192,47 +211,42 @@ Teléfono: 2494 123456
 npm run build          # genera dist/
 ```
 
-- **Vercel**: `npx vercel deploy --prod` (framework: Vite, output `dist`).
-- **Netlify**: arrastrar `dist/` o `npx netlify deploy --prod --dir=dist`.
-- **GitHub Pages**: subir el contenido de `dist/` a la rama `gh-pages`.
-  `vite.config.js` ya usa `base: './'`, así que funciona en subcarpetas.
+- **Vercel**: `npx vercel deploy --prod` (framework Vite, salida `dist`)
+- **Netlify**: arrastrar `dist/` o `npx netlify deploy --prod --dir=dist`
+- **GitHub Pages**: subir el contenido de `dist/` a la rama `gh-pages`
+  (`vite.config.js` usa rutas relativas, así que funciona en subcarpetas)
 
-El negocio sólo paga el dominio (ej. `.com.ar`).
+El local sólo paga el dominio (por ejemplo `.com.ar`).
 
-## 7. Modo demo
-
-Sin `hojaCsv`/`hojaId` configurados, la web carga `public/productos-demo.csv`
-y muestra un cartel de "Modo demostración". Es la forma de mostrarle la
-plantilla a un cliente antes de tener sus productos.
-
-## 8. Checklist antes de entregar a un cliente
-
-- [ ] `marca.nombre`, `eslogan`, `tema`, `radio` y logo definidos.
-- [ ] `whatsapp.numero` con el número real (probarlo desde un celular).
-- [ ] `entrega.envio.costo`, `gratisDesde`, `zonas`, `demora` y datos de retiro.
-- [ ] `pago.transferencia.alias`/`cbu`/`titular` verificados con el dueño.
-- [ ] Google Sheet publicado como CSV y `npm run validar <url>` sin errores.
-- [ ] Prueba completa desde el celular: agregar → confirmar → revisar el
-      mensaje que llega al WhatsApp del local.
-- [ ] Reemplazar `public/favicon.svg` por el logo del negocio.
-
-## 9. Qué está verificado
+## 7. Qué está verificado
 
 | Prueba | Comando | Resultado |
 |---|---|---|
 | Linter | `npm run lint` | 0 avisos en `src/` y `scripts/` |
-| Lógica pura | `npm test` | 14/14 (precios, totales, envío gratis, validaciones, nº de orden, mensaje, link) |
-| Planilla del cliente | `npm run validar <csv\|url>` | 20/20 productos del demo, 0 problemas |
-| Compilación | `npm run build` | 315 kB JS (97 kB gzip) + 40 kB CSS (8 kB gzip) |
-| Flujo de compra E2E | `npm run e2e` | 35/35 comprobaciones, repetible entre corridas |
+| Lógica pura | `npm test` | 15/15 (precios, totales, envío gratis, validaciones, nº de pedido, mensaje, link) |
+| Menú del cliente | `npm run validar <csv\|url>` | 21/21 productos del demo, 0 problemas |
+| Compilación | `npm run build` | 300 kB JS (93 kB gzip) + 37 kB CSS (8 kB gzip) |
+| Flujo de compra E2E | `npm run e2e` | 38/38 comprobaciones, repetible entre corridas |
 
-El E2E recorre catálogo → búsqueda → filtros → carrito → checkout → transferencia →
-enlace de WhatsApp (mensaje decodificado y validado) → pantalla de éxito → persistencia,
-y sale con código de error si algo falla (sirve para CI). Informe en `docs/e2e-resultado.json`.
+El E2E incluye un test específico de usabilidad: escribe letra por letra en el
+formulario y verifica que el campo **no pierda el foco** (`el campo conserva el foco
+mientras se escribe`). Informe en `docs/e2e-resultado.json`.
 
-## 10. Límites conocidos (por diseño)
+## 8. Límites conocidos (por diseño)
 
-- No hay stock real en tiempo real ni reserva: el local confirma por WhatsApp.
-- El `id` de cada producto debe ser único y estable (identifica la línea del carrito).
-- Los precios se muestran tal como están en la hoja; el "pago" es siempre offline.
-- Formato de WhatsApp: `*negrita*` es su sintaxis nativa (no se escapan asteriscos).
+- No hay stock en tiempo real ni reserva: el local confirma por WhatsApp.
+- El menú se actualiza cuando el cliente recarga la página (caché de 10 minutos).
+- El `id` de cada producto debe ser único y estable: identifica la línea del carrito.
+- Los pedidos no quedan guardados en ningún sistema: el historial es el chat.
+- Para ver el modo demo hay que servir el sitio (`npm run dev`/`preview` o subirlo):
+  abrir el archivo con doble clic no permite leer el CSV por restricciones del navegador.
+- Los precios son responsabilidad de la planilla: la web muestra exactamente lo que dice.
+
+## 9. Para presentarlo a un local
+
+1. Cambiar en `negocio.js`: nombre, eslogan, `tema`, número de WhatsApp y datos de
+   envío/retiro.
+2. Cargar sus productos (o directamente conectar su Google Sheet ya publicado).
+3. Publicar en el hosting y mostrarle la URL en el celular: que agregue, elija
+   transferencia y vea el mensaje que llega a su WhatsApp.
+4. Ajustar colores y fotos con su estilo, y dejar la planilla en manos del dueño.
