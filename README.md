@@ -1,5 +1,7 @@
 # Catálogo WhatsApp — plantilla white-label para negocios locales
 
+**Demo online:** https://valentinjurado.github.io/catalogo-whatsapp/ (catálogo de ejemplo, 20 productos)
+
 Web de catálogo + carrito que termina en un pedido por WhatsApp.
 **Sin base de datos, sin backend, sin pasarela de pago.** El "panel de administración"
 es un Google Sheet y el sitio es estático (se publica gratis en Vercel, Netlify o

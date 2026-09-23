@@ -1,6 +1,6 @@
 {
- "url": "http://localhost:4173/",
- "fecha": "2026-09-23T02:10:19.233Z",
+ "url": "https://valentinjurado.github.io/catalogo-whatsapp/",
+ "fecha": "2026-09-23T02:55:48.338Z",
  "checks": {
   "carrito arranca vacío": {
    "ok": true,
@@ -100,7 +100,7 @@
   },
   "el mensaje lleva el número de orden": {
    "ok": true,
-   "detalle": "PED-260922-F6U4"
+   "detalle": "PED-260922-FPNK"
   },
   "el mensaje lleva el detalle con subtotales": {
    "ok": true,
@@ -155,9 +155,9 @@
    "transferencia"
   ],
   "botonesCopiar": 3,
-  "numeroOrden": "PED-260922-F6U4",
-  "mensaje": "*NUEVO PEDIDO PED-260922-F6U4*\nAlmacén Doña Rosa — 22/09/2026 23:10\n\n*Detalle del pedido*\n• 1 x Milanesa napolitana con guarnición (porción) — $ 8.500,00\n• 1 x Empanadas de carne cortada a cuchillo (media docena) — $ 6.500,00\n• 1 x Pan casero de campo (horma) — $ 2.200,00\n\nSubtotal (3 ítems): $ 17.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 2.000,00\n*TOTAL: $ 17.200,00*\n\n*Entrega*\nModalidad: Envío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nForma de pago: Transferencia bancaria\nAlias: almacen.donarosa.mp\nYa realicé el pago al alias indicado, te adjunto el comprobante.\n\n*Cliente*\nNombre: Valentin Jurado\nTeléfono: 2494 123456\n\n_Pedido generado automáticamente desde la web del catálogo._",
-  "ordenGuardada": "PED-260922-F6U4",
+  "numeroOrden": "PED-260922-FPNK",
+  "mensaje": "*NUEVO PEDIDO PED-260922-FPNK*\nAlmacén Doña Rosa — 22/09/2026 23:56\n\n*Detalle del pedido*\n• 1 x Milanesa napolitana con guarnición (porción) — $ 8.500,00\n• 1 x Empanadas de carne cortada a cuchillo (media docena) — $ 6.500,00\n• 1 x Pan casero de campo (horma) — $ 2.200,00\n\nSubtotal (3 ítems): $ 17.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 2.000,00\n*TOTAL: $ 17.200,00*\n\n*Entrega*\nModalidad: Envío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nForma de pago: Transferencia bancaria\nAlias: almacen.donarosa.mp\nYa realicé el pago al alias indicado, te adjunto el comprobante.\n\n*Cliente*\nNombre: Valentin Jurado\nTeléfono: 2494 123456\n\n_Pedido generado automáticamente desde la web del catálogo._",
+  "ordenGuardada": "PED-260922-FPNK",
   "barraMovil": "3 | Ver mi pedido | $ 17.200,00"
  },
  "resumen": {
