@@ -73,6 +73,15 @@ export function construirMensajePedido(pedido, negocio = NEGOCIO) {
 /** Link listo para abrir WhatsApp: https://wa.me/<numero>?text=<mensaje codificado> */
 export function construirUrlWhatsapp(mensaje, numero = NEGOCIO.whatsapp.numero) {
   const destino = limpiarTelefono(numero)
+  // wa.me necesita el número en formato internacional (país + área + número).
+  // Si detectamos un número local argentino (10 dígitos, sin 54), avisamos para
+  // que no se pierda un pedido por un link mal armado.
+  if (/^\d{10}$/.test(destino) && !destino.startsWith('54')) {
+    console.warn(
+      `[whatsapp] El número configurado ("${numero}") parece local. Para wa.me usá el formato ` +
+        `internacional: 54 9 <área> <número> sin + ni espacios -> "549${destino}".`,
+    )
+  }
   return `https://wa.me/${destino}?text=${encodeURIComponent(mensaje)}`
 }
 

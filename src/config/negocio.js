@@ -11,7 +11,7 @@
 export const NEGOCIO = {
   // ---------- Identidad ----------
   marca: {
-    nombre: 'Pizzería Don Mateo',
+    nombre: 'Pizzería',
     eslogan: 'Pizzas, hamburguesas y empanadas',
     descripcion:
       'Pizzas, hamburguesas, empanadas y bebidas, con opciones vegetarianas y veganas. Pedí online y confirmá por WhatsApp: envío a domicilio o retiro en el local.',
@@ -25,9 +25,11 @@ export const NEGOCIO = {
 
   // ---------- WhatsApp del vendedor ----------
   whatsapp: {
-    // ⚠️ PONÉ ACÁ TU NÚMERO PARA PROBAR: formato internacional SIN +, espacios
-    //    ni guiones. Argentina: 54 9 <área> <número>  ->  '5492494123456'
-    numero: '5490000000000',
+    // ⚠️ TU NÚMERO, en formato INTERNACIONAL para wa.me: 54 9 <área> <número>,
+    //    sin +, sin espacios y sin el 0 inicial del área.
+    //    Ejemplo Tandil: 249 468-4061  ->  '5492494684061'
+    //    (con '2494684061' WhatsApp no sabe a qué país llamar)
+    numero: '5492494684061',
     // Se usa en el saludo del mensaje de consulta
     nombreVendedor: 'Mateo',
   },

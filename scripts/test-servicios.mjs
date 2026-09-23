@@ -275,4 +275,11 @@ t('formatea el total en pesos argentinos', () => {
   assert.ok(/19\.900/.test(texto), `esperaba 19.900 en "${texto}"`)
 })
 
+t('arma el link wa.me con el número en formato internacional', () => {
+  const url = construirUrlWhatsapp('hola', '5492494684061')
+  assert.equal(url, 'https://wa.me/5492494684061?text=hola')
+  // con espacios, guiones o + los limpia igual
+  assert.equal(construirUrlWhatsapp('hola', '+54 9 249 468-4061'), 'https://wa.me/5492494684061?text=hola')
+})
+
 console.log(`\n✓ ${pruebas} pruebas de servicios OK\n`)

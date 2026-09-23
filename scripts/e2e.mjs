@@ -186,6 +186,11 @@ try {
   informe.datos.mensaje = texto
 
   comprobar('el enlace apunta a wa.me con el número configurado', /^https:\/\/wa\.me\/\d{10,}\?text=/.test(href || ''), (href || '').split('?')[0])
+  comprobar(
+    'el número está en formato internacional (con código de país)',
+    /^https:\/\/wa\.me\/(?!0)\d{11,}\?/.test(href || ''),
+    (href || '').split('?')[0],
+  )
   comprobar('la URL no tiene espacios ni comillas sin codificar', !/[\s"]/.test(href || ''))
   comprobar('el mensaje lleva el número de orden', /NUEVO PEDIDO PED-\d{6}-[A-Z0-9]{4}/.test(texto))
   comprobar('el mensaje lleva el detalle con subtotales', /• \d+ x .+ — \$/.test(texto))
