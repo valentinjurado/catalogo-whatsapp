@@ -1,0 +1,17 @@
+# Cabeceras de seguridad y privacidad (Netlify / Cloudflare Pages).
+# GitHub Pages no permite definir cabeceras: en ese caso valen las que están
+# declaradas en index.html (referrer y CSP), que cubren lo principal.
+/*
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(), usb=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; connect-src 'self' https://docs.google.com https://*.googleusercontent.com; font-src 'self'; object-src 'none'; base-uri 'self'; form-action 'none'; frame-ancestors 'none'; upgrade-insecure-requests
+
+# El menú puede cachearse un rato; el HTML no, para que los cambios se vean
+/productos-demo.csv
+  Cache-Control: public, max-age=300
+
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
