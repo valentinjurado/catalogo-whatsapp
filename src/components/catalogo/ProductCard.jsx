@@ -1,15 +1,23 @@
 import { formatearPrecio } from '../../services/formato'
 import Boton from '../ui/Boton'
 import ImagenProducto from '../ui/ImagenProducto'
-import { IconoCarrito, IconoCheck, IconoMas, IconoMenos } from '../ui/Iconos'
+import { IconoCarrito, IconoMas, IconoMenos } from '../ui/Iconos'
 
 /**
- * Tarjeta de producto del catálogo.
+ * Tarjeta de producto del menú.
+ * - Tocar la foto o el título abre la ficha con ingredientes y detalle completo.
  * - Muestra precio de oferta tachando el original y el % de descuento.
- * - Si el producto ya está en el carrito, el botón se convierte en contador.
+ * - Si el producto ya está en el pedido, el botón se convierte en contador.
  * - Producto sin stock: se muestra agotado y no se puede agregar.
  */
-export default function ProductCard({ producto, cantidad = 0, prioridad = false, onAgregar, onCambiarCantidad }) {
+export default function ProductCard({
+  producto,
+  cantidad = 0,
+  prioridad = false,
+  onAgregar,
+  onCambiarCantidad,
+  onAbrirFicha,
+}) {
   const {
     titulo,
     descripcion,
@@ -25,6 +33,7 @@ export default function ProductCard({ producto, cantidad = 0, prioridad = false,
 
   const descuento = precioOferta ? Math.round(((precio - precioOferta) / precio) * 100) : 0
   const enCarrito = cantidad > 0
+  const tieneDetalle = Boolean(producto.ingredientes)
 
   return (
     <article
@@ -33,7 +42,12 @@ export default function ProductCard({ producto, cantidad = 0, prioridad = false,
         sinStock ? 'opacity-70' : '',
       ].join(' ')}
     >
-      <div className="relative">
+      <button
+        type="button"
+        onClick={() => onAbrirFicha?.(producto)}
+        aria-label={`Ver detalle de ${titulo}`}
+        className="relative block w-full text-left"
+      >
         <ImagenProducto src={urlImagen} alt={titulo} prioridad={prioridad} />
 
         {descuento > 0 && !sinStock && (
@@ -60,17 +74,33 @@ export default function ProductCard({ producto, cantidad = 0, prioridad = false,
             ))}
           </div>
         )}
-      </div>
+      </button>
 
       <div className="flex flex-1 flex-col p-4">
         <span className="text-[11px] font-semibold uppercase tracking-wider text-brand-700/80">
           {categoria}
         </span>
 
-        <h3 className="mt-1 font-semibold leading-snug text-slate-900">{titulo}</h3>
+        <h3 className="mt-1 font-semibold leading-snug text-slate-900">
+          <button
+            type="button"
+            onClick={() => onAbrirFicha?.(producto)}
+            className="text-left transition hover:text-brand-700"
+          >
+            {titulo}
+          </button>
+        </h3>
 
-        {descripcion && (
-          <p className="mt-1 line-clamp-2 text-sm text-slate-500">{descripcion}</p>
+        {descripcion && <p className="mt-1 line-clamp-2 text-sm text-slate-500">{descripcion}</p>}
+
+        {tieneDetalle && (
+          <button
+            type="button"
+            onClick={() => onAbrirFicha?.(producto)}
+            className="mt-1.5 self-start text-xs font-medium text-brand-700 underline underline-offset-2 transition hover:text-brand-800"
+          >
+            Ver ingredientes
+          </button>
         )}
 
         <div className="mt-auto pt-3.5 flex items-end justify-between gap-2">
@@ -80,9 +110,7 @@ export default function ProductCard({ producto, cantidad = 0, prioridad = false,
                 {formatearPrecio(precio)}
               </span>
             )}
-            <span className="text-lg font-bold text-slate-900">
-              {formatearPrecio(precioFinal)}
-            </span>
+            <span className="text-lg font-bold text-slate-900">{formatearPrecio(precioFinal)}</span>
             {unidad && <span className="ml-1 text-xs text-slate-500">/ {unidad}</span>}
           </div>
         </div>
@@ -116,7 +144,7 @@ export default function ProductCard({ producto, cantidad = 0, prioridad = false,
             <Boton
               onClick={() => onAgregar(producto)}
               className="w-full"
-              iconoIzq={enCarrito ? <IconoCheck className="w-4 h-4" /> : <IconoCarrito className="w-4 h-4" />}
+              iconoIzq={<IconoCarrito className="w-4 h-4" />}
             >
               Agregar al pedido
             </Boton>

@@ -39,12 +39,21 @@ try {
   const { evaluar, enviar } = nav
 
   /* ------------------------- 0. punto de partida ------------------------- */
-  // El carrito se persiste en localStorage: se limpia y se recarga para que la
-  // prueba sea repetible (idempotente) sin importar corridas anteriores.
-  await evaluar("localStorage.removeItem('carrito.v1'); true")
+  // Sin almacenamiento local: la app no debe escribir nada en el dispositivo.
+  await evaluar('localStorage.clear(); sessionStorage.clear(); true')
   await enviar('Page.navigate', { url: URL_BASE })
   await nav.esperarSelector("document.querySelectorAll('article').length > 0")
-  comprobar('carrito arranca vacío', (await evaluar("JSON.parse(localStorage.getItem('carrito.v1')).items.length")) === 0)
+  informe.datos.almacenamiento = {
+    localStorage: await evaluar('localStorage.length'),
+    sessionStorage: await evaluar('sessionStorage.length'),
+    cookies: await evaluar('document.cookie'),
+  }
+  comprobar(
+    'no guarda nada en el dispositivo (sin localStorage/cookies)',
+    informe.datos.almacenamiento.localStorage === 0 &&
+      informe.datos.almacenamiento.sessionStorage === 0 &&
+      informe.datos.almacenamiento.cookies === '',
+  )
 
   /* ------------------------------ 1. menú ------------------------------- */
   informe.datos.tarjetas = await evaluar("document.querySelectorAll('article').length")
@@ -58,7 +67,7 @@ try {
     'botón deshabilitado',
   )
   comprobar('ofertas con precio tachado', (await evaluar("document.querySelectorAll('article .line-through').length")) > 0)
-  comprobar('sin textos técnicos en la página', await evaluar("!/sitio est[áa]tico|sin base de datos|no pedimos datos de tarjeta|modo demostraci[óo]n/i.test(document.body.innerText)"))
+  comprobar('sin textos técnicos en la página', await evaluar("!/sitio est[áa]tico|sin base de datos|no pedimos datos de tarjeta|modo demostraci[óo]n|javascript/i.test(document.body.innerText)"))
 
   await evaluar(scriptForzarPintado)
   await esperar(6000)
@@ -82,17 +91,36 @@ try {
   await evaluar(`[...document.querySelectorAll('button[aria-pressed]')].find(b => b.textContent.startsWith('Todo')).click()`)
   await esperar(500)
 
+  // Filtros rápidos: salen de la columna `etiquetas` del Sheet (Vegano, Veggie…)
+  const hayFiltroVegano = await evaluar(`(() => { const b = [...document.querySelectorAll('button[aria-pressed]')].find(x => x.textContent.startsWith('Vegano')); if (!b) return false; b.click(); return true; })()`)
+  await esperar(700)
+  informe.datos.filtroDieta = await evaluar("document.querySelectorAll('article').length")
+  const soloVegano = await evaluar("(() => { const a = [...document.querySelectorAll('article')]; return a.length > 0 && a.every(x => /vegano/i.test(x.innerText)); })()")
+  comprobar('el filtro rápido por dieta funciona (Vegano)', hayFiltroVegano && soloVegano, `${informe.datos.filtroDieta} productos veganos`)
+  await evaluar(`(() => { const b = [...document.querySelectorAll('button[aria-pressed]')].find(x => x.textContent.startsWith('Vegano')); if (b) b.click(); return true; })()`)
+  await esperar(500)
+
+  /* ------------------------ 2b. ficha del producto ----------------------- */
+  await evaluar("[...document.querySelectorAll('article h3 button')][0].click()")
+  await esperar(900)
+  informe.datos.ficha = await evaluar(scriptTexto('[role=dialog]'))
+  comprobar('abre la ficha con el detalle del producto', await evaluar("!!document.querySelector('[role=dialog] h2')"))
+  comprobar('la ficha muestra los ingredientes', /Ingredientes/i.test(informe.datos.ficha || ''))
+  const agregadoDesdeFicha = await evaluar(`(() => { const b = [...document.querySelectorAll('[role=dialog] button')].find(x => /^Agregar/.test(x.textContent.trim())); if (!b) return false; b.click(); return true; })()`)
+  await esperar(1000)
+  comprobar('agrega desde la ficha y la cierra', agregadoDesdeFicha && !(await evaluar("!!document.querySelector('[role=dialog] h2')")))
+
   /* ------------------------------- 3. carrito ---------------------------- */
   for (let i = 0; i < 3; i++) {
     await evaluar(scriptClickTexto('Agregar al pedido'))
     await esperar(400)
   }
-  const enCarrito = await evaluar("JSON.parse(localStorage.getItem('carrito.v1')).items.length")
-  comprobar('agrega productos al carrito', enCarrito === 3, `${enCarrito} líneas`)
 
   await evaluar("document.querySelector('header button[aria-label^=\"Ver mi pedido\"]').click()")
   await esperar(800)
   comprobar('abre el carrito lateral (off-canvas)', await evaluar("!!document.querySelector('aside')"))
+  const enCarrito = await evaluar("document.querySelectorAll('aside ul li').length")
+  comprobar('agrega productos al pedido (incluye el de la ficha)', enCarrito === 4, `${enCarrito} líneas`)
   comprobar('ofrece envío y retiro', (await evaluar("[...document.querySelectorAll('aside input[name=entrega]')].map(i=>i.value).length")) === 2)
   informe.datos.totalesCarrito = await evaluar(scriptTexto('aside dl'))
   comprobar('calcula totales', /Total/.test(informe.datos.totalesCarrito || ''), informe.datos.totalesCarrito)
@@ -176,8 +204,13 @@ try {
   })()`)
   await esperar(1300)
   comprobar('muestra la pantalla de éxito', (await evaluar("document.querySelector('[role=dialog] h2')?.innerText")) === 'Pedido enviado')
-  informe.datos.ordenGuardada = await evaluar("JSON.parse(localStorage.getItem('carrito.v1')).numeroOrden")
-  comprobar('guarda el número de orden en el dispositivo', typeof informe.datos.ordenGuardada === 'string' && /^PED-/.test(informe.datos.ordenGuardada))
+  informe.datos.ordenEnPantalla = await evaluar("document.querySelector('[role=dialog] .font-mono')?.innerText")
+  comprobar(
+    'el número de pedido coincide con el del mensaje',
+    /^PED-\d{6}-[A-Z0-9]{4}$/.test(informe.datos.ordenEnPantalla || '') &&
+      texto.includes(informe.datos.ordenEnPantalla),
+    informe.datos.ordenEnPantalla,
+  )
 
   /* ---------------------------- 6. responsive --------------------------- */
   await evaluar("document.querySelector('[role=dialog] button[aria-label=Cerrar]').click()")
@@ -188,11 +221,23 @@ try {
   informe.datos.barraMovil = await evaluar(scriptTexto('div.fixed.inset-x-0.bottom-0 button'))
   await enviar('Emulation.clearDeviceMetricsOverride')
 
-  /* --------------------------- 7. persistencia -------------------------- */
+  /* ------------------ 7. el pedido NO queda en el dispositivo ------------ */
   await enviar('Page.navigate', { url: URL_BASE })
   await nav.esperarSelector("document.querySelectorAll('article').length > 0")
-  const tras = await evaluar("JSON.parse(localStorage.getItem('carrito.v1')).items.length")
-  comprobar('el carrito sobrevive al recargar', tras === 3, `${tras} líneas`)
+  const botonTrasRecargar = await evaluar(
+    "document.querySelector('header button[aria-label^=\"Ver mi pedido\"]').innerText.replace(/\\s+/g, ' ').trim()",
+  )
+  comprobar(
+    'al recargar, el pedido arranca vacío (no se guardó nada)',
+    !/\d/.test(botonTrasRecargar.replace(/Mi pedido/g, '')),
+    botonTrasRecargar,
+  )
+  comprobar(
+    'sigue sin escribir en el dispositivo',
+    (await evaluar('localStorage.length')) === 0 &&
+      (await evaluar('sessionStorage.length')) === 0 &&
+      (await evaluar('document.cookie')) === '',
+  )
 } finally {
   await nav.cerrar()
 }

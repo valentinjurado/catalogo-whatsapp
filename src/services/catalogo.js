@@ -4,26 +4,29 @@ import { normalizarTexto, parsearBooleano, parsearPrecio, slug } from './formato
 
 /**
  * ============================================================================
- *  SERVICIO DE CATÁLOGO  —  Google Sheets (CSV público) → array de objetos
+ *  SERVICIO DE MENÚ  —  Google Sheets (CSV público) → array de objetos
  * ============================================================================
  *  Flujo:
  *    1. urlHojaCsv() devuelve la URL (CSV publicado o endpoint gviz).
  *    2. Se lee con Papa Parse (header: true) y se normaliza cada fila.
- *    3. Se filtra lo inactivo, se calcula precio final y se ordena.
- *    4. Se cachea en localStorage (TTL configurable) para que la web abra al
- *       instante y no dependa de Google en cada visita.
+ *    3. Se filtra lo inactivo, se calcula el precio final y se ordena.
+ *    4. Se guarda en memoria durante la sesión de la página, así navegar por el
+ *       menú o reordenar no vuelve a pedirle datos a Google.
  *
- *  El caché es "stale-while-revalidate": se devuelve lo guardado y, si venció,
- *  se refresca en segundo plano (ver hooks/useCatalogo.js).
+ *  PRIVACIDAD: la app NO usa localStorage, cookies ni sessionStorage. Nada del
+ *  menú ni del pedido queda guardado en el dispositivo del cliente: si recarga
+ *  la página, el carrito arranca vacío y el menú se vuelve a pedir a Google.
  */
 
-const CLAVE_CACHE = 'catalogo.cache.v1'
+// Caché en memoria (se pierde al recargar: no toca el disco del cliente)
+let cacheMemoria = null
 
-// Alias aceptados por columna: el dueño del local puede escribir "nombre" o "titulo".
+// Alias aceptados por columna: el dueño puede escribir "nombre" o "titulo".
 const ALIAS = {
   id: ['id', 'codigo', 'código', 'sku'],
   titulo: ['titulo', 'título', 'nombre', 'producto', 'articulo', 'artículo'],
   descripcion: ['descripcion', 'descripción', 'detalle', 'desc'],
+  ingredientes: ['ingredientes', 'composicion', 'composición', 'info', 'informacion', 'información'],
   precio: ['precio', 'precio_lista', 'precio_lista', 'precio normal', 'valor'],
   precioOferta: ['precio_oferta', 'oferta', 'precio_promo', 'precio_promocional', 'promo'],
   categoria: ['categoria', 'categoría', 'rubro', 'seccion', 'sección', 'categoria '],
@@ -46,6 +49,25 @@ const buscar = (fila, claves) => {
 /** Normaliza los encabezados: minúsculas, sin tildes, espacios → "_" */
 function limpiarEncabezado(encabezado) {
   return normalizarTexto(encabezado).replace(/\s+/g, '_')
+}
+
+/**
+ * Convierte links de Google Drive "de compartir" en links que se pueden usar
+ * como <img src>. El dueño sube la foto a Drive, la comparte y pega el link:
+ * la app lo arregla sola.
+ *   …/file/d/ID/view?usp=sharing   ->  https://drive.google.com/uc?export=view&id=ID
+ *   …/open?id=ID                   ->  idem
+ *   …/uc?id=ID  o link directo      ->  queda igual
+ */
+export function normalizarUrlImagen(url) {
+  const original = String(url || '').trim()
+  if (!original) return ''
+  const id = original.match(/\/file\/d\/([a-zA-Z0-9_-]{10,})/)?.[1]
+    || original.match(/[?&]id=([a-zA-Z0-9_-]{10,})/)?.[1]
+  if (id && /drive\.google\.com|docs\.google\.com/.test(original)) {
+    return `https://drive.google.com/uc?export=view&id=${id}`
+  }
+  return original
 }
 
 /** Convierte el texto CSV en filas-objeto con encabezados limpios. */
@@ -74,11 +96,13 @@ export function normalizarProducto(fila, indice = 0) {
     id: String(buscar(fila, ALIAS.id) || slug(titulo) || `prod-${indice + 1}`),
     titulo,
     descripcion: String(buscar(fila, ALIAS.descripcion) || '').trim(),
+    // Texto largo para la ficha del producto (ingredientes, composición, etc.)
+    ingredientes: String(buscar(fila, ALIAS.ingredientes) || '').trim(),
     precio,
     precioOferta: hayOferta ? oferta : null,
     precioFinal: hayOferta ? oferta : precio,
     categoria: String(buscar(fila, ALIAS.categoria) || 'Sin categoría').trim(),
-    urlImagen: String(buscar(fila, ALIAS.urlImagen) || '').trim(),
+    urlImagen: normalizarUrlImagen(buscar(fila, ALIAS.urlImagen)),
     stock,
     sinStock: stock === 0,
     unidad: String(buscar(fila, ALIAS.unidad) || '').trim(),
@@ -99,7 +123,7 @@ function ordenar(a, b) {
   return a.titulo.localeCompare(b.titulo, NEGOCIO.pedido.locale)
 }
 
-/** CSV crudo → { productos, categorias, avisos, totalFilas } */
+/** CSV crudo → { productos, categorias, etiquetas, avisos, totalFilas } */
 export function transformarCatalogo(csv) {
   const { filas, erroresParseo } = parsearCsv(csv)
   const avisos = []
@@ -123,40 +147,27 @@ export function transformarCatalogo(csv) {
 
   productos.sort(ordenar)
   const categorias = [...new Set(productos.map((p) => p.categoria))]
+
+  // Las etiquetas se usan como filtros rápidos (Vegetariano, Vegano, Sin TACC…).
+  // Se cuentan y se ordenan por frecuencia para que las más usadas queden primero.
+  const conteo = new Map()
+  productos.forEach((p) =>
+    p.etiquetas.forEach((e) => conteo.set(e, (conteo.get(e) || 0) + 1)),
+  )
+  const etiquetas = [...conteo.entries()]
+    .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0], NEGOCIO.pedido.locale))
+    .map(([nombre, cantidad]) => ({ nombre, cantidad }))
+
   if (erroresParseo?.length) {
     avisos.push(`${erroresParseo.length} advertencia(s) de formato en el CSV.`)
   }
-  return { productos, categorias, avisos, totalFilas: filas.length }
+  return { productos, categorias, etiquetas, avisos, totalFilas: filas.length }
 }
 
 /* ------------------------------- Caché ---------------------------------- */
 
-function leerCache() {
-  try {
-    const crudo = localStorage.getItem(CLAVE_CACHE)
-    if (!crudo) return null
-    const cache = JSON.parse(crudo)
-    if (!cache?.productos?.length) return null
-    return cache
-  } catch {
-    return null
-  }
-}
-
-function guardarCache(datos) {
-  try {
-    localStorage.setItem(CLAVE_CACHE, JSON.stringify(datos))
-  } catch {
-    /* modo incógnito / cuota llena: se ignora, la app sigue funcionando */
-  }
-}
-
 export function limpiarCache() {
-  try {
-    localStorage.removeItem(CLAVE_CACHE)
-  } catch {
-    /* noop */
-  }
+  cacheMemoria = null
 }
 
 export function cacheVencido(cache, minutos = NEGOCIO.catalogo.refrescoMinutos) {
@@ -164,18 +175,17 @@ export function cacheVencido(cache, minutos = NEGOCIO.catalogo.refrescoMinutos) 
   return Date.now() - cache.guardadoEn > minutos * 60 * 1000
 }
 
-/** Caché disponible sin tocar la red (arranque instantáneo de la UI). */
+/** Menú ya cargado en esta sesión (sin tocar la red ni el disco). */
 export function catalogoEnCache() {
-  const cache = leerCache()
-  return cache ? { ...cache, desdeCache: true } : null
+  return cacheMemoria ? { ...cacheMemoria, desdeCache: true } : null
 }
 
 /* ------------------------------- Descarga -------------------------------- */
 
 /**
- * Descarga y transforma el catálogo.
+ * Descarga y transforma el menú.
  * @param {{forzar?: boolean, señal?: AbortSignal}} opciones
- * @returns {Promise<{productos, categorias, avisos, totalFilas, actualizado, desdeCache, demo}>}
+ * @returns {Promise<{productos, categorias, etiquetas, avisos, totalFilas, actualizado, desdeCache, demo}>}
  */
 export async function obtenerCatalogo({ forzar = false, señal } = {}) {
   const url = urlHojaCsv()
@@ -185,26 +195,25 @@ export async function obtenerCatalogo({ forzar = false, señal } = {}) {
     )
   }
 
-  const cache = leerCache()
-  if (cache && !forzar && !cacheVencido(cache)) {
-    return { ...cache, desdeCache: true }
+  if (cacheMemoria && !forzar && !cacheVencido(cacheMemoria)) {
+    return { ...cacheMemoria, desdeCache: true }
   }
 
   let respuesta
   try {
     respuesta = await fetch(url, { signal: señal, redirect: 'follow' })
   } catch (error) {
-    if (cache) return { ...cache, desdeCache: true, avisoRed: true }
+    if (cacheMemoria) return { ...cacheMemoria, desdeCache: true, avisoRed: true }
     throw new Error(
-      'No pudimos leer el catálogo. Revisá tu conexión e intentá de nuevo. ' +
+      'No pudimos leer el menú. Revisá tu conexión e intentá de nuevo. ' +
         `(detalle: ${error.message})`,
     )
   }
 
   if (!respuesta.ok) {
-    if (cache) return { ...cache, desdeCache: true, avisoRed: true }
+    if (cacheMemoria) return { ...cacheMemoria, desdeCache: true, avisoRed: true }
     throw new Error(
-      `El catálogo respondió ${respuesta.status}. Verificá que la hoja esté publicada como CSV.`,
+      `El menú respondió ${respuesta.status}. Verificá que la hoja esté publicada como CSV.`,
     )
   }
 
@@ -217,12 +226,11 @@ export async function obtenerCatalogo({ forzar = false, señal } = {}) {
   }
 
   const datos = transformarCatalogo(texto)
-  const guardado = {
+  cacheMemoria = {
     ...datos,
     actualizado: new Date().toISOString(),
     guardadoEn: Date.now(),
     demo: url.includes('productos-demo.csv'),
   }
-  guardarCache(guardado)
-  return { ...guardado, desdeCache: false }
+  return { ...cacheMemoria, desdeCache: false }
 }

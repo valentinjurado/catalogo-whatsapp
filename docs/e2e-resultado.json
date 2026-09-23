@@ -1,8 +1,8 @@
 {
  "url": "http://localhost:4173/",
- "fecha": "2026-09-23T03:27:10.939Z",
+ "fecha": "2026-09-23T14:01:24.768Z",
  "checks": {
-  "carrito arranca vacío": {
+  "no guarda nada en el dispositivo (sin localStorage/cookies)": {
    "ok": true,
    "detalle": ""
   },
@@ -16,7 +16,7 @@
   },
   "renderiza productos": {
    "ok": true,
-   "detalle": "21 tarjetas"
+   "detalle": "18 tarjetas"
   },
   "producto agotado bloqueado": {
    "ok": true,
@@ -32,23 +32,39 @@
   },
   "imágenes de producto cargadas": {
    "ok": true,
-   "detalle": "21/21"
+   "detalle": "18/18"
   },
   "el buscador filtra": {
    "ok": true,
-   "detalle": "8 resultados"
+   "detalle": "5 resultados"
   },
   "el filtro por categoría funciona": {
    "ok": true,
-   "detalle": "4 en Hamburguesas"
+   "detalle": "5 en Hamburguesas"
   },
-  "agrega productos al carrito": {
+  "el filtro rápido por dieta funciona (Vegano)": {
    "ok": true,
-   "detalle": "3 líneas"
+   "detalle": "3 productos veganos"
+  },
+  "abre la ficha con el detalle del producto": {
+   "ok": true,
+   "detalle": ""
+  },
+  "la ficha muestra los ingredientes": {
+   "ok": true,
+   "detalle": ""
+  },
+  "agrega desde la ficha y la cierra": {
+   "ok": true,
+   "detalle": ""
   },
   "abre el carrito lateral (off-canvas)": {
    "ok": true,
    "detalle": ""
+  },
+  "agrega productos al pedido (incluye el de la ficha)": {
+   "ok": true,
+   "detalle": "4 líneas"
   },
   "ofrece envío y retiro": {
    "ok": true,
@@ -56,7 +72,7 @@
   },
   "calcula totales": {
    "ok": true,
-   "detalle": "Subtotal | $ 33.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 1.600,00 | Total | $ 33.200,00"
+   "detalle": "Subtotal | $ 43.100,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 3.200,00 | Total | $ 43.100,00"
   },
   "abre el checkout en el paso de datos": {
    "ok": true,
@@ -142,25 +158,36 @@
    "ok": true,
    "detalle": ""
   },
-  "guarda el número de orden en el dispositivo": {
+  "el número de pedido coincide con el del mensaje": {
    "ok": true,
-   "detalle": ""
+   "detalle": "PED-260923-FWRK"
   },
   "en celular aparece la barra de pedido": {
    "ok": true,
    "detalle": ""
   },
-  "el carrito sobrevive al recargar": {
+  "al recargar, el pedido arranca vacío (no se guardó nada)": {
    "ok": true,
-   "detalle": "3 líneas"
+   "detalle": "Mi pedido"
+  },
+  "sigue sin escribir en el dispositivo": {
+   "ok": true,
+   "detalle": ""
   }
  },
  "datos": {
-  "tarjetas": 21,
-  "imagenes": "21/21",
-  "busqueda": 8,
-  "porCategoria": 4,
-  "totalesCarrito": "Subtotal | $ 33.200,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 1.600,00 | Total | $ 33.200,00",
+  "almacenamiento": {
+   "localStorage": 0,
+   "sessionStorage": 0,
+   "cookies": ""
+  },
+  "tarjetas": 18,
+  "imagenes": "18/18",
+  "busqueda": 5,
+  "porCategoria": 5,
+  "filtroDieta": 3,
+  "ficha": "Pizza muzzarella | Pizzas | $ 9.800,00 | / 8 porciones | Más pedida | La clásica, al molde. | INGREDIENTES | Masa de pizza, salsa de tomate, muzzarella, aceitunas verdes, orégano. | 1 | Agregar $ 9.800,00",
+  "totalesCarrito": "Subtotal | $ 43.100,00 | Envío | Sin cargo | Ahorro por ofertas | -$ 3.200,00 | Total | $ 43.100,00",
   "focoPorTecla": [
    "campo-nombre-y-apellido",
    "campo-nombre-y-apellido",
@@ -177,13 +204,13 @@
    "transferencia"
   ],
   "numeroOrden": null,
-  "mensaje": "*NUEVO PEDIDO PED-260923-URWG*\nPizzería Don Mateo — 23/09/2026 00:27\n\n*Detalle*\n• 1 x Pizza muzzarella al molde (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n\nSubtotal: $ 33.200,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 1.600,00\n*TOTAL: $ 33.200,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
-  "ordenGuardada": "PED-260923-URWG",
-  "barraMovil": "3 | Ver mi pedido | $ 33.200,00"
+  "mensaje": "*NUEVO PEDIDO PED-260923-FWRK*\nPizzería Don Mateo — 23/09/2026 11:01\n\n*Detalle*\n• 1 x Pizza muzzarella (8 porciones) — $ 9.800,00\n• 1 x Pizza napolitana (8 porciones) — $ 11.500,00\n• 1 x Pizza especial (8 porciones) — $ 11.900,00\n• 1 x Hamburguesa doble cheddar (unidad) — $ 9.900,00\n\nSubtotal: $ 43.100,00\nEnvío: sin cargo (promoción)\nAhorro por ofertas: -$ 3.200,00\n*TOTAL: $ 43.100,00*\n\n*Entrega*\nEnvío a domicilio\nDirección: Rivadavia 1234, Tandil\n\n*Pago*\nTransferencia: pasame el alias para transferir.\n\n*Cliente*\nValentin Jurado\nTeléfono: 2494 123456",
+  "ordenEnPantalla": "PED-260923-FWRK",
+  "barraMovil": "4 | Ver mi pedido | $ 43.100,00"
  },
  "resumen": {
-  "total": 38,
-  "ok": 38,
+  "total": 43,
+  "ok": 43,
   "fallos": []
  }
 }

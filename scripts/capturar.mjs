@@ -46,6 +46,10 @@ try {
     await evaluar("document.querySelector('#menu').scrollIntoView({ block: 'start' }); true")
     await esperar(1000)
     await evaluar('window.scrollBy(0, 130); true')
+  } else if (guion === 'ficha') {
+    // abre la ficha del primer producto (detalle + ingredientes)
+    await evaluar("[...document.querySelectorAll('article h3 button')][0].click(); true")
+    await esperar(1400)
   } else if (guion === 'carrito' || guion === 'pago') {
     for (let i = 0; i < 3; i++) {
       await evaluar(scriptClickTexto('Agregar al pedido'))

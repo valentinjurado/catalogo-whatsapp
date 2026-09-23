@@ -1,13 +1,19 @@
 import { IconoBuscar, IconoCerrar } from '../ui/Iconos'
 
 /**
- * Barra de búsqueda + filtros por categoría + orden.
- * Es "no controlada" del catálogo: recibe estado y avisa cambios.
+ * Buscador + filtros del menú:
+ *   - chips de categoría (una sola activa)
+ *   - chips de "filtros rápidos" que salen de la columna `etiquetas` del Sheet
+ *     (Vegetariano, Vegano, Sin TACC, Picante…): se combinan con la categoría
+ *   - orden por precio o nombre
  */
 export default function Filtros({
   categorias,
   categoria,
   onCategoria,
+  etiquetas = [],
+  etiqueta,
+  onEtiqueta,
   busqueda,
   onBusqueda,
   orden,
@@ -65,15 +71,32 @@ export default function Filtros({
         </div>
       )}
 
+      {etiquetas.length > 0 && (
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-slate-500">Filtros rápidos:</span>
+          {etiquetas.map((e) => (
+            <Chip
+              key={e.nombre}
+              activo={etiqueta === e.nombre}
+              onClick={() => onEtiqueta(etiqueta === e.nombre ? '' : e.nombre)}
+              tono="suave"
+            >
+              {e.nombre} ({e.cantidad})
+            </Chip>
+          ))}
+        </div>
+      )}
+
       <p className="text-xs text-slate-500">
-        {cantidadResultados} {cantidadResultados === 1 ? 'producto' : 'productos'} disponibles
+        {cantidadResultados} {cantidadResultados === 1 ? 'producto' : 'productos'}
         {categoria && ` en ${categoria}`}
+        {etiqueta && ` con la etiqueta ${etiqueta}`}
       </p>
     </div>
   )
 }
 
-function Chip({ children, activo, onClick }) {
+function Chip({ children, activo, onClick, tono = 'fuerte' }) {
   return (
     <button
       onClick={onClick}
@@ -82,7 +105,9 @@ function Chip({ children, activo, onClick }) {
         'shrink-0 rounded-full border px-3.5 h-9 text-sm font-medium transition',
         activo
           ? 'border-brand-600 bg-brand-600 text-white shadow-sm shadow-brand-600/20'
-          : 'border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-brand-700',
+          : tono === 'suave'
+            ? 'border-dashed border-slate-300 bg-white text-slate-600 hover:border-brand-300 hover:text-brand-700'
+            : 'border-slate-200 bg-white text-slate-600 hover:border-brand-200 hover:text-brand-700',
       ].join(' ')}
     >
       {children}

@@ -16,7 +16,7 @@ import {
   validarCheckout,
 } from '../src/services/pedido.js'
 import { construirMensajePedido, construirUrlWhatsapp } from '../src/services/whatsapp.js'
-import { transformarCatalogo } from '../src/services/catalogo.js'
+import { transformarCatalogo, normalizarUrlImagen } from '../src/services/catalogo.js'
 import { NEGOCIO } from '../src/config/negocio.js'
 
 let pruebas = 0
@@ -84,6 +84,43 @@ t('una oferta mayor al precio se descarta (no infla el total)', () => {
   const { productos } = transformarCatalogo(csv)
   assert.equal(productos[0].precioOferta, null)
   assert.equal(productos[0].precioFinal, 1000)
+})
+
+t('convierte links de Google Drive en links directos de imagen', () => {
+  assert.equal(
+    normalizarUrlImagen('https://drive.google.com/file/d/1AbCdEfGhIjKlMnOpQr/view?usp=sharing'),
+    'https://drive.google.com/uc?export=view&id=1AbCdEfGhIjKlMnOpQr',
+  )
+  assert.equal(
+    normalizarUrlImagen('https://drive.google.com/open?id=1AbCdEfGhIjKlMnOpQr'),
+    'https://drive.google.com/uc?export=view&id=1AbCdEfGhIjKlMnOpQr',
+  )
+  assert.equal(
+    normalizarUrlImagen('https://miapp.com/fotos/pizza.jpg'),
+    'https://miapp.com/fotos/pizza.jpg',
+    'un link normal queda igual',
+  )
+  assert.equal(normalizarUrlImagen(''), '')
+})
+
+t('lee ingredientes y arma los filtros rápidos con las etiquetas', () => {
+  const csv = [
+    'titulo,precio,etiquetas,ingredientes',
+    '"Pizza vegana","13.900","Vegano,Vegetariano","Masa, queso vegetal, tomates cherry"',
+    'Empanada de carne,7500,Más pedida,"Carne, cebolla, huevo"',
+    'Agua,2500,,Agua mineral',
+  ].join('\n')
+  const { productos, etiquetas } = transformarCatalogo(csv)
+  const vegana = productos.find((p) => p.titulo === 'Pizza vegana')
+
+  assert.equal(vegana.ingredientes, 'Masa, queso vegetal, tomates cherry')
+  assert.deepEqual(vegana.etiquetas, ['Vegano', 'Vegetariano'])
+  assert.deepEqual(
+    etiquetas.map((e) => e.nombre),
+    ['Más pedida', 'Vegano', 'Vegetariano'],
+    'las etiquetas se cuentan y ordenan para los filtros rápidos',
+  )
+  assert.equal(etiquetas.find((e) => e.nombre === 'Vegano').cantidad, 1)
 })
 
 console.log('\npedido.js')

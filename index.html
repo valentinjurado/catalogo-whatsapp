@@ -4,27 +4,41 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#059669" />
+    <meta name="theme-color" content="#EA580C" />
 
-    <!-- SEO: lo sobreescribe src/config/negocio.js al arrancar (una sola fuente de verdad) -->
-    <title>Catálogo online | Pedidos por WhatsApp</title>
-    <meta
-      name="description"
-      content="Mirá el catálogo, armá tu pedido y confirmalo por WhatsApp. Envío a domicilio o retiro en el local."
-    />
+    <!--
+      Los %DATOS% se reemplazan en el build con los valores de src/config/negocio.js
+      (ver el plugin datosDelNegocioEnElHtml en vite.config.js).
+    -->
+    <title>%NEGOCIO% | Pedidos por WhatsApp</title>
+    <meta name="description" content="%DESCRIPCION%" />
     <meta name="robots" content="index, follow" />
     <meta property="og:type" content="website" />
-    <meta property="og:title" content="Catálogo online | Pedidos por WhatsApp" />
-    <meta
-      property="og:description"
-      content="Armá tu pedido en segundos y confirmalo por WhatsApp. Sin registros, sin tarjetas."
-    />
+    <meta property="og:title" content="%NEGOCIO% | Pedidos por WhatsApp" />
+    <meta property="og:description" content="%ESLOGAN%. Pedí online y confirmá por WhatsApp." />
     <meta name="twitter:card" content="summary_large_image" />
   </head>
   <body class="antialiased">
     <div id="root"></div>
     <noscript>
-      Para armar pedidos necesitás activar JavaScript en tu navegador.
+      <div
+        style="max-width: 34rem; margin: 3rem auto; padding: 1.5rem; font-family: system-ui, sans-serif; line-height: 1.6; color: #1e293b; border: 1px solid #e2e8f0; border-radius: 1rem"
+      >
+        <h1 style="font-size: 1.25rem; margin: 0 0 0.5rem">%NEGOCIO%</h1>
+        <p style="margin: 0">
+          No pudimos mostrar el menú porque tu navegador tiene desactivada una función que
+          necesitamos para armarlo. Se activa en las opciones del navegador (Configuración →
+          Privacidad y seguridad).
+        </p>
+        <p style="margin: 0.75rem 0 0">
+          O más simple: pedinos por WhatsApp y te tomamos el pedido igual.
+        </p>
+        <p style="margin: 0.75rem 0 0; font-size: 1.25rem">
+          <a href="%WHATSAPP_LINK%" style="color: #ea580c; font-weight: 700; text-decoration: none">
+            WhatsApp: %WHATSAPP%
+          </a>
+        </p>
+      </div>
     </noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>

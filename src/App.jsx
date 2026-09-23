@@ -6,17 +6,19 @@ import { useToast } from './components/ui/Toast'
 import Header from './components/layout/Header'
 import Footer from './components/layout/Footer'
 import Catalogo from './components/catalogo/Catalogo'
+import FichaProducto from './components/catalogo/FichaProducto'
 import CartWidget from './components/carrito/CartWidget'
 import BarraPedidoMovil from './components/carrito/BarraPedidoMovil'
 import CheckoutModal from './components/checkout/CheckoutModal'
 
 /**
- * Raíz de la aplicación: catálogo (fetch al Google Sheet) + carrito + checkout.
- * No hay rutas ni backend: todo vive en este árbol de componentes.
+ * Raíz de la aplicación: menú (fetch al Google Sheet) + pedido + checkout.
+ * No hay rutas ni backend: todo vive en este árbol de componentes, y nada se
+ * guarda en el dispositivo del cliente (sin localStorage ni cookies).
  *
  * Los handlers van con useCallback: si cambiaran de identidad en cada render,
- * los efectos de los hijos (modal, carrito) se re-ejecutarían al escribir y el
- * usuario perdería el foco en los campos.
+ * los efectos de los hijos (modal, carrito, ficha) se re-ejecutarían al escribir
+ * y el usuario perdería el foco en los campos.
  */
 function Tienda() {
   const carrito = useCarrito()
@@ -34,8 +36,8 @@ function Tienda() {
   const cerrarCheckout = useCallback(() => setCheckoutAbierto(false), [])
 
   const agregar = useCallback(
-    (producto) => {
-      carrito.agregar(producto)
+    (producto, cantidad = 1) => {
+      carrito.agregar(producto, cantidad)
       avisar({
         titulo: 'Agregado',
         detalle: producto.titulo,
@@ -43,6 +45,15 @@ function Tienda() {
       })
     },
     [carrito, avisar],
+  )
+
+  // Agregar desde la ficha: suma y cierra la ficha
+  const agregarDesdeFicha = useCallback(
+    (producto, cantidad = 1) => {
+      agregar(producto, cantidad)
+      carrito.cerrarFicha()
+    },
+    [agregar, carrito],
   )
 
   return (
@@ -53,6 +64,7 @@ function Tienda() {
         <Catalogo
           productos={catalogo.productos}
           categorias={catalogo.categorias}
+          etiquetas={catalogo.etiquetas}
           cargando={catalogo.cargando}
           refrescando={catalogo.refrescando}
           error={catalogo.error}
@@ -62,13 +74,14 @@ function Tienda() {
           cantidadEnCarrito={carrito.cantidadEnCarrito}
           onAgregar={agregar}
           onCambiarCantidad={carrito.cambiarCantidad}
+          onAbrirFicha={carrito.abrirFicha}
         />
       </main>
 
       <Footer />
 
       <BarraPedidoMovil
-        visible={!carrito.abierto && !checkoutAbierto}
+        visible={!carrito.abierto && !checkoutAbierto && !carrito.ficha}
         cantidadTotal={carrito.cantidadTotal}
         total={carrito.totales.total}
         onAbrir={abrirCarrito}
@@ -88,6 +101,16 @@ function Tienda() {
         onVaciar={carrito.vaciar}
         onContinuar={abrirCheckout}
       />
+
+      {/* Ficha del producto (ingredientes y detalle completo) */}
+      {carrito.ficha && (
+        <FichaProducto
+          producto={carrito.ficha}
+          cantidad={carrito.cantidadEnCarrito(carrito.ficha.id)}
+          onCerrar={carrito.cerrarFicha}
+          onAgregar={agregarDesdeFicha}
+        />
+      )}
 
       {/* Se monta sólo cuando está abierto: el flujo arranca limpio cada vez */}
       {checkoutAbierto && <CheckoutModal abierto onCerrar={cerrarCheckout} />}

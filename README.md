@@ -65,16 +65,50 @@ sola (la URL de la hoja nunca cambia, no hay que tocar código ni volver a publi
 |---|---|
 | **Agregar** un producto | Escribo una fila nueva al final con `id`, `titulo` y `precio` (lo demás es opcional) |
 | **Modificar** precio o texto | Edito la celda. El cliente lo ve al recargar la página (máx. 10 minutos de caché) |
-| **Eliminar** un producto | Opción limpia: pongo `no` en `activo` (deja de mostrarse y es reversible). Opción final: borro la fila |
-| **Cambiar el stock** | `stock` = cantidad. Con `0` el producto se muestra **Agotado** y no se puede pedir. Vacío = sin control de stock |
+| **Eliminar** un producto | Opción limpia: `activo = no` (deja de mostrarse y es reversible). Opción final: borro la fila |
+| **Cambiar el stock** | `stock` = cantidad. Con `0` se muestra **Agotado** y no se puede pedir. Vacío = sin control |
 | **Poner una oferta** | Escribo el precio rebajado en `precio_oferta`: se muestra tachado y con el % de descuento |
-| **Reordenar** el menú | Uso la columna `orden` (1, 2, 3…) y `destacado = si` para los que van primero |
-| **Categorías** | Las genera la columna `categoria` (ej. Pizzas, Hamburguesas, Bebidas); se arman los filtros solos |
-| **Sacar una categoría** | Se deja de usar la palabra en `categoria` y desaparece del filtro |
+| **Reordenar** el menú | `orden` = 1, 2, 3… y `destacado = si` para los que van primero |
+| **Categorías** | Las genera la columna `categoria` (Pizzas, Hamburguesas, Empanadas, Bebidas): los filtros se arman solos |
+| **Agregar un filtro (vegano, vegetariano, sin TACC…)** | Escribo esa palabra en `etiquetas`: aparece como chip en “Filtros rápidos”. No hay lista fija, la que uses existe |
+| **Cargar ingredientes** | Escribo el texto en `ingredientes`: se ve en la ficha del producto |
 
 Se puede editar desde el celular con la app de Google Sheets. No hay usuarios,
 contraseñas ni panel que mantener. El dueño necesita tener la hoja en su cuenta de
 Google (es gratis) y dejarla publicada como CSV una sola vez.
+
+### ¿El stock se descuenta solo?
+
+**No, y conviene que sepas por qué:** para descontar stock automáticamente hace falta un lugar
+donde *escribir* (servidor o base de datos). Este proyecto es 100 % estático: la planilla se
+lee, nunca se modifica desde la web. Entonces:
+
+- **Hoy:** cuando algo se termina, el dueño pone `stock = 0` desde el celular y en la web
+  aparece **Agotado**. Son 5 segundos y lo decide quien está en la cocina.
+- **Si algún día lo quieren automático:** se suma un **Google Apps Script** como mini API
+  gratuita (lee y escribe en la misma hoja) y resta stock al entrar un pedido. Es el único
+  camino sin pagar servidores, con un riesgo a tener en cuenta: dos pedidos simultáneos del
+  último producto. Para un local chico, el control manual es más simple y más seguro.
+- **Lo que sí hace la web:** avisar. El cliente ve “Agotado”, no puede pedirlo, y el mensaje
+  que llega al local lleva el detalle para confirmar disponibilidad.
+
+### Cómo se publican las fotos
+
+La planilla guarda **un link público** a la foto (no el archivo). La web lo usa como `<img src>`:
+
+1. **Google Drive** (ya integrado): subo la foto → *Compartir* → *Cualquier persona con el
+   enlace* → copio el enlace → lo pego en `url_imagen`. La web lo convierte sola a link directo
+   (`/file/d/ID/view` → `uc?export=view&id=ID`). Si Drive cambia los permisos, la tarjeta
+   muestra la inicial del producto en vez de una imagen rota.
+2. **Lo más estable:** subir las fotos al mismo hosting del sitio o a un servicio de imágenes
+   (Imgur, Cloudinary). No dependen de permisos de Drive.
+3. **Verificar después de cargar:** `npm run validar <url-del-csv>` avisa de imágenes vacías,
+   links que no son http(s) y links de Drive (mostrando cómo quedan convertidos).
+
+> ⚠️ **Qué conviene NO publicar en la planilla:** la hoja publicada como CSV es *pública*
+> (cualquiera con el link la lee, incluidos los productos con `activo = no` y la columna
+> `stock`). No pongas ahí costos, márgenes, datos de proveedores ni notas internas: para eso,
+> usá **otra pestaña** del documento y publicá sólo la pestaña del menú.
 
 ### Si algún día quiere un panel web con login y formularios
 
@@ -93,14 +127,15 @@ Posible sin cambiar la arquitectura, pero ya no es "cero backend":
 |---|---|---|---|
 | `id` | no | `PZ01` | Si falta se genera desde el título. **No repetir**: el carrito agrupa por id |
 | `titulo` | **sí** | `Pizza muzzarella al molde` | Fila sin título = ignorada |
-| `descripcion` | no | `Masa al molde, muzzarella y aceitunas` | Se recorta a 2 líneas en la tarjeta |
+| `descripcion` | no | `La clásica, al molde.` | Se recorta a 2 líneas en la tarjeta |
+| `ingredientes` | no | `Masa, salsa de tomate, muzzarella, aceitunas` | Se muestra en la ficha del producto (“Ver ingredientes”) |
 | `precio` | **sí** | `9800` o `9.800,50` | Acepta `$`, puntos y comas |
 | `precio_oferta` | no | `8900` | Si es menor al precio: tachado + % de descuento |
 | `categoria` | no | `Pizzas` | Arma los filtros del menú |
 | `url_imagen` | no | `https://…jpg` | En Drive: `drive.google.com/uc?export=view&id=ID` |
 | `stock` | no | `12` | `0` = Agotado. Vacío = sin control |
 | `unidad` | no | `8 porciones` | Se muestra como `/ 8 porciones` junto al precio |
-| `etiquetas` | no | `Más pedida,Promo` | Hasta 2 etiquetas, separadas por coma |
+| `etiquetas` | no | `Vegano,Más pedida` | Hasta 2 visibles en la tarjeta y **todas se vuelven filtros rápidos** |
 | `destacado` | no | `si` | Ordena primero |
 | `activo` | no | `si` / `no` | `no` = no se publica (borrado lógico) |
 | `orden` | no | `1` | Orden manual dentro de la categoría |
@@ -123,17 +158,27 @@ del documento en `catalogo.hojaId` + el `gid` de la pestaña.
 
 ## 4. Flujo de compra
 
-1. **Menú**: buscador, filtros por categoría y ordenamiento. Los productos aparecen
-   primero, sin pantallas de presentación.
-2. **Carrito lateral**: cantidades, aclaración por producto ("sin cebolla"), modalidad
-   de entrega, barra de progreso hacia el envío gratis y totales.
-3. **Checkout en dos pantallas**: datos y entrega → forma de pago.
-4. **Pago**: el cliente sólo elige **Efectivo** o **Transferencia**. La web no publica
-   alias, CBU ni ningún dato bancario: si elige transferencia, ese mismo pedido le
-   avisa al local por el chat que tiene que pasar el alias.
-5. **Enviar pedido**: se abre `wa.me` con el mensaje ya escrito (número de pedido,
-   detalle, totales, entrega, pago y datos del cliente) y después se muestra el
-   número de pedido para tenerlo a mano.
+1. **Menú primero**: buscador, filtros por categoría, **filtros rápidos** por etiqueta
+   (Vegetariano, Vegano, Sin TACC, Picante…) y ordenamiento. Sin pantallas de presentación de
+   por medio: apenas entra, el cliente ve los productos.
+2. **Ficha del producto**: tocando la foto o el título se abre el detalle con foto grande,
+   descripción completa, **ingredientes**, etiquetas y selector de cantidad. La tarjeta muestra
+   “Ver ingredientes” cuando hay detalle cargado.
+3. **Pedido lateral**: cantidades, aclaración por producto ("sin cebolla"), modalidad de
+   entrega, barra de progreso hacia el envío gratis y totales.
+4. **Checkout en dos pantallas**: datos y entrega → forma de pago.
+5. **Pago**: el cliente sólo elige **Efectivo** o **Transferencia**. La web no publica alias,
+   CBU ni ningún dato bancario: si elige transferencia, ese mismo pedido le avisa al local por
+   el chat que tiene que pasar el alias.
+6. **Enviar pedido**: se abre `wa.me` con el mensaje ya escrito (número de pedido, detalle,
+   totales, entrega, pago y datos del cliente) y después se muestra el número de pedido.
+
+### El cliente no deja rastro en su dispositivo
+
+La web **no usa localStorage, cookies ni sessionStorage**: no guarda el pedido, ni los datos
+personales, ni el menú en el teléfono del cliente. Todo vive en la memoria de la página: si
+recarga, el pedido arranca vacío y el menú se vuelve a pedir a Google. (Está verificado en el
+E2E: `no guarda nada en el dispositivo (sin localStorage/cookies)`.)
 
 ### Ejemplo del mensaje que le llega al local
 
@@ -193,7 +238,7 @@ Teléfono: 2494 123456
    ├─ hooks/                    useCatalogo, useCopiar
    ├─ components/
    │  ├─ layout/    Header · Footer
-   │  ├─ catalogo/  Catalogo · Filtros · ProductCard
+   │  ├─ catalogo/  Catalogo · Filtros · ProductCard · FichaProducto
    │  ├─ carrito/   CartWidget (off-canvas) · ItemCarrito · SelectorEntrega · BarraPedidoMovil
    │  ├─ checkout/  CheckoutModal · PasoDatos · PasoPago · PantallaExito
    │  └─ ui/        Boton · Modal · Toast · Campo · ImagenProducto · Estados · Iconos
@@ -223,10 +268,12 @@ El local sólo paga el dominio (por ejemplo `.com.ar`).
 | Prueba | Comando | Resultado |
 |---|---|---|
 | Linter | `npm run lint` | 0 avisos en `src/` y `scripts/` |
-| Lógica pura | `npm test` | 15/15 (precios, totales, envío gratis, validaciones, nº de pedido, mensaje, link) |
-| Menú del cliente | `npm run validar <csv\|url>` | 21/21 productos del demo, 0 problemas |
-| Compilación | `npm run build` | 300 kB JS (93 kB gzip) + 37 kB CSS (8 kB gzip) |
-| Flujo de compra E2E | `npm run e2e` | 38/38 comprobaciones, repetible entre corridas |
+| Lógica pura | `npm test` | 17/17 (precios, totales, envío gratis, validaciones, nº de pedido, mensaje, link, links de Drive, ingredientes) |
+| Menú del cliente | `npm run validar <csv\|url>` | 18/18 productos del demo, 4 categorías, 0 problemas |
+| Compilación | `npm run build` | 305 kB JS (94 kB gzip) + 38 kB CSS (8 kB gzip) |
+| Flujo de compra E2E | `npm run e2e` | 43/43 comprobaciones, repetible entre corridas |
+| Privacidad | incluido en el E2E | no escribe localStorage, sessionStorage ni cookies |
+| Usabilidad del formulario | incluido en el E2E | escribe letra por letra y verifica que el campo **no pierda el foco** |
 
 El E2E incluye un test específico de usabilidad: escribe letra por letra en el
 formulario y verifica que el campo **no pierda el foco** (`el campo conserva el foco
@@ -234,9 +281,12 @@ mientras se escribe`). Informe en `docs/e2e-resultado.json`.
 
 ## 8. Límites conocidos (por diseño)
 
-- No hay stock en tiempo real ni reserva: el local confirma por WhatsApp.
+- No hay stock en tiempo real ni reserva: **el stock se actualiza a mano en la planilla** (ver arriba)
+  y el local confirma por WhatsApp.
+- El pedido vive en la memoria de la página: si el cliente recarga, se vacía (a cambio, no se
+  guarda nada suyo en el dispositivo).
 - El menú se actualiza cuando el cliente recarga la página (caché de 10 minutos).
-- El `id` de cada producto debe ser único y estable: identifica la línea del carrito.
+- El `id` de cada producto debe ser único y estable: identifica la línea del pedido.
 - Los pedidos no quedan guardados en ningún sistema: el historial es el chat.
 - Para ver el modo demo hay que servir el sitio (`npm run dev`/`preview` o subirlo):
   abrir el archivo con doble clic no permite leer el CSV por restricciones del navegador.

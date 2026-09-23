@@ -2,13 +2,16 @@ import { NEGOCIO } from '../config/negocio.js'
 
 /**
  * ============================================================================
- *  ESTADO DEL CARRITO (reducer puro)
+ *  ESTADO DEL PEDIDO (reducer puro)
  * ============================================================================
  *  Reglas de negocio encapsuladas acá:
  *   - Un producto se identifica por id: sumar el mismo producto incrementa.
  *   - Máximo por línea configurable; nunca menos de 1 (para eso está QUITAR).
- *   - Los precios guardados en el carrito se refrescan si cambia la planilla
- *     (acción SINCRONIZAR).
+ *   - Los precios guardados se refrescan si cambia la planilla (SINCRONIZAR).
+ *
+ *  PRIVACIDAD: todo esto vive en memoria. No se guarda nada en el dispositivo
+ *  del cliente (ni localStorage, ni cookies, ni sessionStorage): si recarga la
+ *  página, el pedido arranca vacío.
  */
 
 export const MAX_POR_LINEA = 99
@@ -27,9 +30,10 @@ export const estadoInicial = {
     aclaraciones: '',
   },
   numeroOrden: null,
+  ficha: null, // producto abierto en la ficha de detalle
 }
 
-/** Convierte un producto del catálogo en línea de carrito. */
+/** Convierte un producto del menú en línea del pedido. */
 export function lineaDesdeProducto(producto, cantidad = 1) {
   return {
     id: producto.id,
@@ -48,13 +52,15 @@ export function lineaDesdeProducto(producto, cantidad = 1) {
 
 export function carritoReducer(estado, accion) {
   switch (accion.type) {
-    case 'HIDRATAR':
-      return { ...estado, ...accion.estado }
-
     case 'ABRIR':
       return { ...estado, abierto: true }
     case 'CERRAR':
       return { ...estado, abierto: false }
+
+    case 'ABRIR_FICHA':
+      return { ...estado, ficha: accion.producto }
+    case 'CERRAR_FICHA':
+      return { ...estado, ficha: null }
 
     case 'AGREGAR': {
       const existente = estado.items.find((i) => i.id === accion.producto.id)
@@ -66,13 +72,11 @@ export function carritoReducer(estado, accion) {
               ? { ...i, cantidad: Math.min(i.cantidad + (accion.cantidad || 1), MAX_POR_LINEA) }
               : i,
           ),
-          ultimoAgregado: accion.producto.id,
         }
       }
       return {
         ...estado,
         items: [...estado.items, lineaDesdeProducto(accion.producto, accion.cantidad || 1)],
-        ultimoAgregado: accion.producto.id,
       }
     }
 
@@ -117,8 +121,8 @@ export function carritoReducer(estado, accion) {
       return { ...estado, numeroOrden: accion.numeroOrden }
 
     /**
-     * Refresca precios/disponibilidad con la última versión del catálogo,
-     * conservando cantidades y notas. Elimina productos que se dieron de baja.
+     * Refresca precios/disponibilidad con la última versión del menú, conservando
+     * cantidades y notas. Elimina productos que se dieron de baja.
      */
     case 'SINCRONIZAR': {
       const mapa = new Map(accion.productos.map((p) => [p.id, p]))

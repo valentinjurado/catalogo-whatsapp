@@ -6,13 +6,14 @@ import { ErrorCatalogo, GrillaSkeleton, SinResultados } from '../ui/Estados'
 import { IconoRefrescar } from '../ui/Iconos'
 
 /**
- * <Catalogo> — primera sección de la página: filtros + grilla de productos.
+ * <Catalogo> — primera sección de la página: buscador, filtros y grilla del menú.
  * Recibe los datos ya resueltos (el fetch vive en useCatalogo) para que el
  * componente sea puro y fácil de testear.
  */
 export default function Catalogo({
   productos = [],
   categorias = [],
+  etiquetas = [],
   cargando = false,
   refrescando = false,
   error = null,
@@ -22,20 +23,23 @@ export default function Catalogo({
   cantidadEnCarrito,
   onAgregar,
   onCambiarCantidad,
+  onAbrirFicha,
 }) {
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState('')
+  const [etiqueta, setEtiqueta] = useState('')
   const [orden, setOrden] = useState('recomendado')
 
   const visibles = useMemo(() => {
     const q = normalizarTexto(busqueda)
     let lista = productos.filter((p) => {
-      const coincideCategoria = !categoria || p.categoria === categoria
-      if (!coincideCategoria) return false
+      if (categoria && p.categoria !== categoria) return false
+      if (etiqueta && !p.etiquetas.includes(etiqueta)) return false
       if (!q) return true
       return (
         normalizarTexto(p.titulo).includes(q) ||
         normalizarTexto(p.descripcion).includes(q) ||
+        normalizarTexto(p.ingredientes).includes(q) ||
         normalizarTexto(p.categoria).includes(q) ||
         p.etiquetas.some((e) => normalizarTexto(e).includes(q))
       )
@@ -47,7 +51,13 @@ export default function Catalogo({
       lista = [...lista].sort((a, b) => a.titulo.localeCompare(b.titulo, 'es'))
 
     return lista
-  }, [productos, busqueda, categoria, orden])
+  }, [productos, busqueda, categoria, etiqueta, orden])
+
+  const limpiarFiltros = () => {
+    setBusqueda('')
+    setCategoria('')
+    setEtiqueta('')
+  }
 
   return (
     <section id="menu" className="mx-auto max-w-7xl scroll-mt-20 px-4 py-8 sm:px-6 sm:py-10">
@@ -79,6 +89,9 @@ export default function Catalogo({
           categorias={categorias}
           categoria={categoria}
           onCategoria={setCategoria}
+          etiquetas={etiquetas}
+          etiqueta={etiqueta}
+          onEtiqueta={setEtiqueta}
           busqueda={busqueda}
           onBusqueda={setBusqueda}
           orden={orden}
@@ -107,13 +120,7 @@ export default function Catalogo({
         ) : error && !productos.length ? (
           <ErrorCatalogo mensaje={error} onReintentar={onRecargar} />
         ) : visibles.length === 0 ? (
-          <SinResultados
-            busqueda={busqueda || categoria}
-            onLimpiar={() => {
-              setBusqueda('')
-              setCategoria('')
-            }}
-          />
+          <SinResultados busqueda={busqueda || categoria || etiqueta} onLimpiar={limpiarFiltros} />
         ) : (
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3 xl:grid-cols-4">
             {visibles.map((p, i) => (
@@ -124,6 +131,7 @@ export default function Catalogo({
                 cantidad={cantidadEnCarrito?.(p.id) || 0}
                 onAgregar={onAgregar}
                 onCambiarCantidad={onCambiarCantidad}
+                onAbrirFicha={onAbrirFicha}
               />
             ))}
           </div>
@@ -132,7 +140,8 @@ export default function Catalogo({
 
       {error && productos.length > 0 && (
         <p className="mt-6 rounded-xl border border-amber-200 bg-amber-50/70 px-4 py-3 text-xs text-amber-800">
-          Mostrando el menú guardado en tu teléfono: {error}
+          No pudimos actualizar el menú ({error}). Seguimos mostrando la última versión de esta
+          visita; tocá “Actualizar” para reintentar.
         </p>
       )}
     </section>

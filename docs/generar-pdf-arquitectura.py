@@ -256,8 +256,43 @@ En el celular, una barra fija mantiene el pedido a un toque.
              'Los destacados van primero y después manda el orden'],
             ['Crear o quitar categorías', 'Uso o dejo de usar palabras en <b>categoria</b>',
              'Los filtros de arriba se arman solos desde la planilla'],
+            ['Agregar un filtro (vegano, sin TACC…)', 'Escribo esa palabra en <b>etiquetas</b>',
+             'Aparece como chip en “Filtros rápidos”: no hay lista fija'],
+            ['Cargar ingredientes', 'Escribo el texto en <b>ingredientes</b>',
+             'Se muestra en la ficha del producto, con “Ver ingredientes” en la tarjeta'],
         ],
         [3.1 * cm, 6.6 * cm, 7.3 * cm]))
+
+    historia.append(P('¿El stock se descuenta solo?', 'h2'))
+    historia.extend(bullets([
+        '<b>No, y es una decisión de arquitectura.</b> Descontar stock exige un lugar donde '
+        '<i>escribir</i>: un servidor o una base de datos. Acá la planilla se lee y nunca se '
+        'modifica desde la web.',
+        '<b>Cómo se maneja en la práctica:</b> cuando algo se termina, el dueño pone '
+        '<font face="Courier" size="8">stock = 0</font> desde el celular y en la web aparece '
+        '“Agotado” (no se puede pedir). Son segundos y lo decide quien está en la cocina.',
+        '<b>Si algún día lo quieren automático:</b> se agrega un Google Apps Script como mini API '
+        'gratuita que descuente al entrar cada pedido. Único camino sin pagar servidores; el riesgo '
+        'a conversar es el de dos pedidos simultáneos del último producto.',
+        '<b>Lo que sí hace la web:</b> avisar. El cliente ve “Agotado” y el pedido que llega al '
+        'local lleva el detalle para confirmar disponibilidad.',
+    ]))
+
+    historia.append(P('Cómo se publican las fotos de los productos', 'h2'))
+    historia.extend(bullets([
+        'La planilla guarda <b>un link público</b>, no el archivo. <b>Google Drive ya está '
+        'integrado</b>: se comparte la foto como “cualquiera con el enlace” y la web convierte '
+        'sola el link de compartir en link directo (<font face="Courier" size="8">/file/d/ID/view'
+        '</font> → <font face="Courier" size="8">uc?export=view&amp;id=ID</font>).',
+        'Lo más estable: subir las fotos al hosting del sitio o a un servicio de imágenes '
+        '(Imgur, Cloudinary): no dependen de permisos de Drive.',
+        'Si una foto falla, la tarjeta muestra la inicial del producto en lugar del ícono de '
+        'imagen rota: la grilla nunca se ve “rota”.',
+        '<b>Qué no publicar:</b> la hoja publicada como CSV es pública (incluye productos con '
+        '<font face="Courier" size="8">activo = no</font> y la columna <font face="Courier" '
+        'size="8">stock</font>). Costos, márgenes y notas internas van en otra pestaña que no se '
+        'publica.',
+    ]))
 
     historia.append(P(
         'Se puede editar desde el celular con la app de Google Sheets. No hay usuarios, contraseñas '
@@ -281,7 +316,8 @@ En el celular, una barra fija mantiene el pedido a un toque.
             ['id', 'no', 'MIL01', 'Identifica el producto. Si falta se genera desde el título. '
                                   '<b>Debe ser único</b>: el carrito agrupa por id.'],
             ['titulo', 'SÍ', 'Milanesa napolitana', 'Nombre visible. Una fila sin título se ignora.'],
-            ['descripcion', 'no', 'Con muzzarella y papas', 'Texto libre. En la tarjeta se recorta a 2 líneas.'],
+            ['descripcion', 'no', 'La clásica, al molde.', 'Texto libre. En la tarjeta se recorta a 2 líneas.'],
+            ['ingredientes', 'no', 'Masa, salsa, muzzarella…', 'Se muestra en la ficha del producto (foto grande + detalle).'],
             ['precio', 'SÍ', '9800', 'Acepta 9800, 9.800,50, $ 9.800. La coma decimal se interpreta sola.'],
             ['precio_oferta', 'no', '8500', 'Si es menor al precio, se muestra tachado y con el % de descuento.'],
             ['categoria', 'no', 'Rotisería', 'Con esto se arman los filtros de arriba del catálogo.'],
@@ -289,7 +325,7 @@ En el celular, una barra fija mantiene el pedido a un toque.
                                               'drive.google.com/uc?export=view&id=ID'],
             ['stock', 'no', '12', '0 = Agotado (no se puede agregar). Vacío = sin control de stock.'],
             ['unidad', 'no', 'kg', 'Se muestra como “/ kg” junto al precio.'],
-            ['etiquetas', 'no', 'Popular,Oferta', 'Hasta 2 etiquetas separadas por coma.'],
+            ['etiquetas', 'no', 'Vegano,Más pedida', 'Hasta 2 visibles en la tarjeta y todas se vuelven filtros rápidos.'],
             ['destacado', 'no', 'si', 'Los destacados se ordenan primero en el catálogo.'],
             ['activo', 'no', 'si', 'Con “no” el producto no se publica (borrado lógico, reversible).'],
             ['orden', 'no', '1', 'Orden manual dentro de la categoría (1, 2, 3…).'],
@@ -530,8 +566,14 @@ Teléfono: 2494 123456
 
     historia.append(P('Pantallas del flujo de pago (sólo se elige cómo pagar)', 'h2'))
     historia.extend(bullets([
-        '<b>Carrito lateral:</b> cantidades, aclaración por producto, modalidad de entrega, barra de '
-        'progreso hacia el envío gratis y totales. El botón dice <i>Continuar</i>.',
+        '<b>El menú es lo primero:</b> buscador, filtros por categoría y <b>filtros rápidos</b> que '
+        'salen de la columna <i>etiquetas</i> (Vegetariano, Vegano, Sin TACC, Picante…). Sin '
+        'pantallas de presentación de por medio.',
+        '<b>Ficha del producto:</b> tocando la foto o el título se abre el detalle con foto grande, '
+        'descripción completa, <b>ingredientes</b>, etiquetas y selector de cantidad. Resuelve el '
+        '“¿qué lleva?” sin llamar al local.',
+        '<b>Pedido lateral (off-canvas):</b> cantidades, aclaración por producto, modalidad de '
+        'entrega, barra de progreso hacia el envío gratis y totales.',
         '<b>Pantalla 1 – Datos y entrega:</b> nombre, teléfono, dirección (sólo si elige envío), '
         'referencia para el repartidor, horario preferido y aclaraciones. Validación por campo.',
         '<b>Pantalla 2 – Forma de pago:</b> Efectivo o Transferencia, y el botón verde '
@@ -540,6 +582,15 @@ Teléfono: 2494 123456
         '<b>Cierre:</b> número de pedido a la vista, botón para reabrir WhatsApp y opción de copiar '
         'el pedido como comprobante del armado.',
     ]))
+
+    historia.append(P('El cliente no deja rastro en su dispositivo', 'h2'))
+    historia.append(P(
+        'La web no usa <font face="Courier" size="8">localStorage</font>, cookies ni '
+        '<font face="Courier" size="8">sessionStorage</font>: no guarda el pedido, ni los datos '
+        'personales, ni el menú en el teléfono de quien compra. Todo vive en la memoria de la '
+        'página (y el menú se cachea en memoria durante la visita para no golpear a Google en cada '
+        'interacción). Si el cliente recarga, el pedido arranca vacío. Está verificado en el E2E '
+        '(<i>no guarda nada en el dispositivo</i>).', 'chico'))
 
     historia.append(PageBreak())
 
@@ -577,7 +628,7 @@ catalogo-whatsapp/
    │  └─ useCopiar.js       copiar (pedido) con respaldo y aviso de fallo
    ├─ components/
    │  ├─ layout/   Header · Footer
-   │  ├─ catalogo/ Catalogo · Filtros · ProductCard
+   │  ├─ catalogo/ Catalogo · Filtros · ProductCard · FichaProducto
    │  ├─ carrito/  CartWidget (off-canvas) · ItemCarrito · SelectorEntrega · BarraPedidoMovil
    │  ├─ checkout/ CheckoutModal · PasoDatos · PasoPago · PantallaExito
    │  └─ ui/       Boton · Modal · Toast · Campo · ImagenProducto · Estados · Iconos
@@ -623,6 +674,7 @@ catalogo-whatsapp/
             ['Robo de credenciales', 'No', 'No hay login, ni tokens, ni API keys en el front. La hoja solo se lee.'],
             ['Datos de tarjetas (PCI)', 'No', 'No se piden ni se procesan medios de pago en la web.'],
             ['Datos bancarios publicados', 'No', 'La web no muestra alias ni CBU. Si el cliente paga por transferencia, el local comparte el alias por el chat, donde queda el pedido.'],
+            ['Rastro en el dispositivo del cliente', 'No', 'Sin localStorage, cookies ni sessionStorage: al recargar, no queda nada guardado en su teléfono.'],
             ['Pagos fraudulentos', 'No', 'No hay pasarela: el cobro se acuerda por fuera y lo controla el local.'],
             ['XSS desde la planilla', 'Mitigado', 'React escapa todo texto interpolado; no se usa innerHTML ni dangerouslySetInnerHTML.'],
             ['Manipulación de precios', 'Mitigado', 'El total se recalcula desde los precios del catálogo; el mensaje lleva el detalle para que el local lo verifique.'],
@@ -684,15 +736,17 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
         ['Prueba', 'Resultado'],
         [
             ['Linter (oxlint)', 'OK — 0 avisos en src/ y scripts/'],
-            ['Compilación de producción', 'OK — 50 módulos, build en ~0,5 s'],
-            ['Pruebas de lógica (npm test)', 'OK — 15/15 (precios, totales, envío, validaciones, nº de pedido, mensaje, link)'],
-            ['Validador del menú (npm run validar)', 'OK — 21 productos, 21 activos, 5 categorías, 0 problemas'],
-            ['Fotos del menú', '34 URLs verificadas (HTTP 200); 21/21 cargan y se pintan (600×450)'],
-            ['E2E navegador real (npm run e2e)', 'OK — 38/38 comprobaciones, repetible entre corridas'],
+            ['Compilación de producción', 'OK — 48 módulos, build en ~1 s'],
+            ['Pruebas de lógica (npm test)', 'OK — 17/17 (precios, totales, envío, validaciones, nº de pedido, mensaje, link, links de Drive, ingredientes y etiquetas)'],
+            ['Validador del menú (npm run validar)', 'OK — 18 productos, 4 categorías, 6 filtros rápidos, 0 problemas'],
+            ['Fotos del menú', '40 URLs verificadas (HTTP 200); 18/18 cargan y se pintan (600×450)'],
+            ['E2E navegador real (npm run e2e)', 'OK — 43/43 comprobaciones, repetible entre corridas'],
+            ['Privacidad del dispositivo', 'OK — el E2E comprueba localStorage, sessionStorage y cookies en cero'],
+            ['Ficha de producto', 'OK — abre desde la tarjeta, muestra ingredientes y agrega al pedido'],
+            ['Filtros rápidos', 'OK — los chips salen de la columna etiquetas (Vegetariano, Vegano…)'],
             ['Bug de usabilidad (foco al escribir)', 'Corregido y verificado: el campo conserva el foco en cada tecla'],
             ['Sin datos bancarios', 'Verificado: la pantalla de pago y el mensaje no contienen alias, CBU ni CVU'],
             ['Link de WhatsApp', 'OK — wa.me con el mensaje codificado completo y sin espacios sin codificar'],
-            ['Persistencia', 'OK — el carrito y el número de pedido sobreviven al recargar (localStorage)'],
             ['Responsive', 'OK — capturas en 1440×900 y 390×844 con barra de pedido fija en el celular'],
         ],
         [6.4 * cm, 10.6 * cm]))
@@ -746,9 +800,13 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
         ]
 
     historia += captura('captura-escritorio.png',
-                        'El menú es lo primero que ve el cliente (1440 px): filtros generados desde la '
-                        'planilla, ofertas con precio tachado y porcentaje, etiquetas, y el botón de '
-                        'agregar en cada tarjeta.')
+                        'El menú es lo primero que ve el cliente (1440 px): categorías, filtros rápidos '
+                        'por etiqueta (Vegano, Vegetariano, Más pedida…), ofertas con precio tachado y '
+                        'el botón “Ver ingredientes” en cada tarjeta.')
+    historia += captura('captura-ficha.png',
+                        'Ficha del producto: se abre desde la tarjeta y muestra foto grande, precio, '
+                        'etiquetas, descripción e ingredientes, con selector de cantidad. Resuelve el '
+                        '“¿qué lleva?” sin llamar al local.')
     historia += captura('captura-pago.png',
                         'Pantalla de forma de pago: sólo se elige entre efectivo y transferencia. No hay '
                         'datos bancarios, ni campos de tarjeta, ni un paso extra de confirmación: el botón '
@@ -772,8 +830,11 @@ node scripts/capturar.mjs http://localhost:4173 docs/captura.png 1440 900 0 gril
     historia.append(P('8. Límites conocidos y cómo venderlo como plantilla', 'h1'))
     historia.append(P('Límites por diseño (conviene decirlos antes de vender)', 'h2'))
     historia.extend(bullets([
-        'No hay stock en tiempo real ni reserva de mercadería: el local confirma por WhatsApp.',
-        'El menú se actualiza cuando el cliente recarga la página (la caché dura 10 minutos).',
+        'No hay stock en tiempo real ni reserva: el stock se actualiza a mano en la planilla y el '
+        'local confirma por WhatsApp.',
+        'El pedido vive en la memoria de la página: si el cliente recarga, arranca vacío (a cambio, '
+        'no queda nada suyo guardado en el dispositivo).',
+        'El menú se actualiza cuando el cliente recarga la página (la caché en memoria dura 10 minutos).',
         'La web no publica datos bancarios: el alias se pasa por el chat cuando el cliente elige '
         'transferencia (queda registrado en la conversación).',
         'El <i>id</i> de cada producto debe ser único y estable: es lo que identifica la línea del pedido.',

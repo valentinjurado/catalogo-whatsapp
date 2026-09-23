@@ -7,17 +7,11 @@ import { aplicarPaleta } from './config/paletas'
 import { CarritoProvider } from './state/CarritoContext'
 import { ToastProvider } from './components/ui/Toast'
 
-// 1) Tema del negocio (variables CSS) antes de pintar
+// Tema del negocio (variables CSS) antes de pintar.
+// El título y la descripción ya vienen escritos en el HTML desde el build
+// (plugin datosDelNegocioEnElHtml en vite.config.js), así los lee cualquier
+// buscador o vista previa de WhatsApp sin ejecutar JavaScript.
 aplicarPaleta(NEGOCIO.marca.tema, NEGOCIO.marca.radio)
-
-// 2) SEO básico desde la configuración: una sola fuente de verdad
-document.title = `${NEGOCIO.marca.nombre} | Pedidos por WhatsApp`
-const descripcion = document.querySelector('meta[name="description"]')
-if (descripcion) descripcion.setAttribute('content', NEGOCIO.marca.descripcion)
-document.querySelector('meta[property="og:title"]')?.setAttribute('content', document.title)
-document
-  .querySelector('meta[property="og:description"]')
-  ?.setAttribute('content', NEGOCIO.marca.descripcion)
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

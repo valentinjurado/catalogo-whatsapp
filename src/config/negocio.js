@@ -12,9 +12,9 @@ export const NEGOCIO = {
   // ---------- Identidad ----------
   marca: {
     nombre: 'Pizzería Don Mateo',
-    eslogan: 'Pizzas al molde, empanadas y hamburguesas',
+    eslogan: 'Pizzas, hamburguesas y empanadas',
     descripcion:
-      'Pizzas al molde, empanadas, hamburguesas y postres. Pedí online y confirmá por WhatsApp: envío a domicilio o retiro en el local.',
+      'Pizzas, hamburguesas, empanadas y bebidas, con opciones vegetarianas y veganas. Pedí online y confirmá por WhatsApp: envío a domicilio o retiro en el local.',
     // Tema visual: verde | azul | bordo | naranja | violeta | grafito
     tema: 'naranja',
     // Redondeo de tarjetas en píxeles (16 = suave, 4 = recto)
